@@ -8,7 +8,7 @@ workspace "Snowflax"
 	}
 
 	files {
-		"premake5.lua"
+		"premake5.lua",
 		".gitignore"
 	}
 
