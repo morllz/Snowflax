@@ -7,11 +7,6 @@ workspace "Snowflax"
 		"Dist"
 	}
 
-	files {
-		"premake5.lua",
-		".gitignore"
-	}
-
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 
