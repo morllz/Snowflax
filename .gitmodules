@@ -1,0 +1,3 @@
+[submodule "Snowflax/vendor/spdlog"]
+	path = Snowflax/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git

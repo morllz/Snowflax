@@ -8,8 +8,9 @@ workspace "Snowflax"
 	}
 
 	files {
-		"premake5.lua"
-		".gitignore"
+		"premake5.lua",
+		".gitignore",
+		".gitmodules"
 	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -28,6 +29,11 @@ project "Snowflax"
 	files {
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs {
+		"Snowflax/src",
+		"Snowflax/vendor/spdlog/include"
 	}
 
 	filter "system:windows"
@@ -74,7 +80,8 @@ project "Sandbox"
 	}
 
 	includedirs {
-		"Snowflax/src"
+		"Snowflax/src",
+		"Snowflax/vendor/spdlog/include"
 	}
 
 	links {
