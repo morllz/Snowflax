@@ -2,6 +2,10 @@
 bin/
 bin-int/
 
+*.sln
+*.vcxproj
+*.vcxproj.*
+
 
 
 ## Ignore Visual Studio temporary files, build results, and
