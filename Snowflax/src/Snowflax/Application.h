@@ -11,5 +11,6 @@ namespace Snowflax {
 		virtual ~Application();
 
 		void Run();
+		void Shutdown();
 	};
 }

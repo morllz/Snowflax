@@ -13,4 +13,7 @@ namespace Snowflax {
 	void Application::Run() {
 
 	}
+	void Application::Shutdown() {
+
+	}
 }
