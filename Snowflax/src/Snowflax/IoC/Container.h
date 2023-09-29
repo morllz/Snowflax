@@ -17,10 +17,12 @@ concept NotParameterized = !Parameterized<T>;
 
 class Container {
 public:
+    
+
     template<class T>
     using Generator = std::function<std::shared_ptr<T>()>;
-    template<class T>
-    using ParameterizedGenerator = std::function<std::shared_ptr<T>(typename T::IoCParams params)>;
+    template<class T, class...Ps>
+    using ParameterizedGenerator = std::function<std::shared_ptr<T>(Ps&&...arg)>;
 
     template<NotParameterized T>
     void RegisterFactory(Generator<T> gen) {
@@ -35,9 +37,9 @@ public:
     std::shared_ptr<T> Resolve() {
         return m_Resolve<T, Generator<T>>();
     }
-    template<Parameterized T>
-    std::shared_ptr<T> Resolve(typename T::IoCParams&& params = {}) {
-        return m_Resolve<T, ParameterizedGenerator<T>>(std::forward<typename T::IoCParams>(params));
+    template<Parameterized T, class...Ps>
+    std::shared_ptr<T> Resolve(Ps&&...arg) {
+        return m_Resolve<T, ParameterizedGenerator<T>>(std::forward<Ps>(params)...);
     }
 
     static Container& Get() {
