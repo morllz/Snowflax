@@ -1,3 +1,7 @@
+// TODO: Test all this shit!!!!!!
+//       Move all other than declerations to Container.cpp
+
+
 #pragma once
 
 #include <unordered_map> 
@@ -7,17 +11,14 @@
 #include <memory>
 #include <format>
 
-template<class T>
-concept Parameterized = requires() {
-    { typename T::IoCParams{} };
-};
+template<class T, class ...Ps>
+concept Parameterized = std::is_constructible_v<T, Ps...> && sizeof...(Ps) > 0;
 template<class T>
 concept NotParameterized = !Parameterized<T>;
 
 
 class Container {
 public:
-    
 
     template<class T>
     using Generator = std::function<std::shared_ptr<T>()>;
@@ -26,11 +27,15 @@ public:
 
     template<NotParameterized T>
     void RegisterFactory(Generator<T> gen) {
-        factoryMap[typeid(T)] = gen;
+        factoryMap[typeid(T)] = { State::InstanceGenerator, std::move(gen) };
     }
     template<Parameterized T>
     void RegisterFactory(ParameterizedGenerator<T> gen) {
-        factoryMap[typeid(T)] = gen;
+        factoryMap[typeid(T)] = { State::InstanceGenerator, std::move(gen) };
+    }
+    template<class T>
+    void RegisterSingleton(Generator<T> gen) {
+        factoryMap[typeid(T)] = { State::SingletonGenerator, std::move(gen) };
     }
 
     template<NotParameterized T>
@@ -39,7 +44,7 @@ public:
     }
     template<Parameterized T, class...Ps>
     std::shared_ptr<T> Resolve(Ps&&...arg) {
-        return m_Resolve<T, ParameterizedGenerator<T>>(std::forward<Ps>(params)...);
+        return m_Resolve<T, ParameterizedGenerator<T>>(std::forward<Ps>(arg)...);
     }
 
     static Container& Get() {
@@ -47,25 +52,60 @@ public:
         return c;
     }
 private:
+    enum class State {
+        InstanceGenerator,
+        SingletonGenerator,
+        SingletonInstance
+    };
+    struct Entry {
+        State state;
+        std::any content;
+    };
     template<class T, class G, class...Ps>
     std::shared_ptr<T> m_Resolve(Ps&&...arg) {
-        if (const auto i = factoryMap.find(typeid(T); i != factoryMap.end())) {
+        if (const auto i = factoryMap.find(typeid(T)); i != factoryMap.end()) {
+            auto& entry = i->second;
+            if (entry.state != State::InstanceGenerator && sizeof...(Ps) > 0) {
+                throw std::runtime_error{ "Parameter passed in while resolving a singleton!" };
+            }
+            else if (entry.state == State::InstanceGenerator && Parameterized<T> && sizeof...(Ps) == 0) {
+                throw std::runtime_error{ "No parameters passed while resolving an independent instance!" };
+            }
             try {
-                return std::any_cast<G>(i->second)(std::forward<Ps>(arg)...);
+                std::shared_ptr<T> ptr;
+                switch (entry.state) {
+                case State::InstanceGenerator:
+                    ptr = std::any_cast<G>(entry.content)(std::forward<Ps>(arg)...);
+                    break;
+                case State::SingletonGenerator:
+                    ptr = std::any_cast<G>(entry.content)(std::forward<Ps>(arg)...);
+                    entry.content = ptr;
+                    entry.state = State::SingletonInstance;
+                    break;
+                case State::SingletonInstance:
+                    std::any_cast<std::shared_ptr<T>>(entry.content);
+                    break;
+                default:
+                    break;
+                }
+                return ptr;
             }
             catch (const std::bad_any_cast&) {
                 throw std::runtime_error{
                     std::format(
                         "Could not resolve Services mapped type\nfrom: [{}]\n to: [{}]\n",
-                        i->second.type().name(), typeid(G).name()
-                    );
-                }
+                        entry.content.type().name(), typeid(G).name()
+                    )
+                };
             }
         }
+        else if (useContructor)
+            return std::make_shared<T>(std::forward<Ps>(arg)...);
         else {
-            throw std::runtime_error{ std::format("Could not find generator for type [{}] in factory map!", typeid(T).name()) }; y
+            throw std::runtime_error{ std::format("Could not find generator for type [{}] in factory map!", typeid(T).name()) };
         }
     }
 
-    std::unordered_map<std::type_index, std::any> factoryMap;
+    std::unordered_map<std::type_index, Entry> factoryMap;
+    bool useContructor = false;
 };
