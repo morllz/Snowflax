@@ -12,7 +12,7 @@
 #include <format>
 
 template<class T, class ...Ps>
-concept Parameterized = std::is_constructible_v<T, Ps...> && sizeof...(Ps) > 0;
+concept Parameterized = sizeof...(Ps) > 0;
 template<class T>
 concept NotParameterized = !Parameterized<T>;
 
@@ -25,17 +25,18 @@ public:
     template<class T, class...Ps>
     using ParameterizedGenerator = std::function<std::shared_ptr<T>(Ps&&...arg)>;
 
+
     template<NotParameterized T>
     void RegisterFactory(Generator<T> gen) {
-        factoryMap[typeid(T)] = { State::InstanceGenerator, std::move(gen) };
+        m_factoryMap[typeid(T)] = { State::InstanceGenerator, std::move(gen) };
     }
     template<Parameterized T>
     void RegisterFactory(ParameterizedGenerator<T> gen) {
-        factoryMap[typeid(T)] = { State::InstanceGenerator, std::move(gen) };
+        m_factoryMap[typeid(T)] = { State::InstanceGenerator, std::move(gen) };
     }
     template<class T>
     void RegisterSingleton(Generator<T> gen) {
-        factoryMap[typeid(T)] = { State::SingletonGenerator, std::move(gen) };
+        m_factoryMap[typeid(T)] = { State::SingletonGenerator, std::move(gen) };
     }
 
     template<NotParameterized T>
@@ -61,9 +62,10 @@ private:
         State state;
         std::any content;
     };
+
     template<class T, class G, class...Ps>
     std::shared_ptr<T> m_Resolve(Ps&&...arg) {
-        if (const auto i = factoryMap.find(typeid(T)); i != factoryMap.end()) {
+        if (const auto i = m_factoryMap.find(typeid(T)); i != m_factoryMap.end()) {
             auto& entry = i->second;
             if (entry.state != State::InstanceGenerator && sizeof...(Ps) > 0) {
                 throw std::runtime_error{ "Parameter passed in while resolving a singleton!" };
@@ -99,13 +101,13 @@ private:
                 };
             }
         }
-        else if (useContructor)
+        else if (m_useContructor)
             return std::make_shared<T>(std::forward<Ps>(arg)...);
         else {
             throw std::runtime_error{ std::format("Could not find generator for type [{}] in factory map!", typeid(T).name()) };
         }
     }
 
-    std::unordered_map<std::type_index, Entry> factoryMap;
-    bool useContructor = false;
+    std::unordered_map<std::type_index, Entry> m_factoryMap;
+    bool m_useContructor = false;
 };
