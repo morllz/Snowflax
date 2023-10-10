@@ -13,6 +13,8 @@ workspace "Snowflax"
 		".gitmodules"
 	}
 
+	startproject "Snowflax"
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 
@@ -105,3 +107,50 @@ project "Sandbox"
 		optimize "On"
 
 -- Project "Sandbox"
+
+-- Project "SnowflaxTest"
+project "SnowflaxTest"
+	location "SnowflaxTest"
+	kind "ConsoleApp"
+	language "C++"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"SnowflaxTest/vendor/googletest/googletest/**.h",
+        "SnowflaxTest/vendor/googletest/googletest/**.hpp",
+        "SnowflaxTest/vendor/googletest/googletest/src/gtest-all.cc"
+	}
+
+	includedirs {
+		"Snowflax/src",
+		"Snowflax/vendor/spdlog/include",
+		"SnowflaxTest/vendor/googletest/googletest/include",
+		"SnowflaxTest/vendor/googletest/googletest/"
+
+	}
+
+	links {
+		"Snowflax"
+	}
+
+	defines {
+		"SFX_PLATFORM_WINDOWS"
+	}
+
+	filter "configurations:Debug"
+		defines "SFX_DEBUG"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines "SFX_RELEASE"
+		optimize "On"
+
+	filter "configurations:Dist"
+		defines "SFX_DIST"
+		optimize "On"
+
+-- Project "SnowflaxTest"
