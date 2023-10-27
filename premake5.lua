@@ -86,6 +86,9 @@ project "Sandbox"
 		"Snowflax/vendor/spdlog/include"
 	}
 
+	filter "system:windows"
+		cppdialect "C++20"
+
 	links {
 		"Snowflax"
 	}
@@ -133,9 +136,8 @@ project "SnowflaxTest"
 
 	}
 
-	links {
-		"Snowflax"
-	}
+	filter "system:windows"
+		cppdialect "C++20"
 
 	defines {
 		"SFX_PLATFORM_WINDOWS"
