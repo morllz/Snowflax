@@ -70,22 +70,22 @@ namespace Snowflax {
                             "Wrong arguments passed to function: [{}]\n",
                             typeid(G).name()
                         )
-                    }
+                    };
                 }
             }
-            else if (m_useContructor)
-            try {
-                return std::make_shared<T>(std::forward<Ps>(arg)...);
-            }
-            catch {
-                throw std::runtime_error{
-                    std::format(
-                        "Could not construct [{}] with [{}] passed as arguments!",
-                        typeid(T).name(), ...typeid(T).name
-                    )
+            else if (m_useContructor) {
+                try {
+                    return std::make_shared<T>(std::forward<Ps>(arg)...);
                 }
-            }
-                
+                catch (const std::invalid_argument&) {
+                    throw std::runtime_error{
+                        std::format(
+                            "Could not construct [{}] with [{}] passed as arguments!",
+                            typeid(T).name(), typeid(T).name()...
+                        )
+                    };
+                }
+            }   
             else {
                 throw std::runtime_error{ std::format("Could not find generator for type [{}] in factory map!", typeid(T).name()) };
             }

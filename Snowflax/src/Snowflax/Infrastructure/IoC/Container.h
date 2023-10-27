@@ -1,6 +1,3 @@
-// TODO: Test all this shit!!!!!!
-
-
 #pragma once
 
 #include <unordered_map> 
@@ -57,7 +54,7 @@ namespace Snowflax {
             std::shared_ptr<T> m_Resolve(Ps&&...arg);
 
             std::unordered_map<std::type_index, Entry> m_factoryMap;
-            bool m_useContructor = false;
+            bool m_useContructor = true;
 
         };
     }

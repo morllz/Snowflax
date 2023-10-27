@@ -13,7 +13,7 @@ workspace "Snowflax"
 		".gitmodules"
 	}
 
-	startproject "Snowflax"
+	startproject "Sandbox"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -120,16 +120,16 @@ project "SnowflaxTest"
 	files {
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
-		"SnowflaxTest/vendor/googletest/googletest/**.h",
-        "SnowflaxTest/vendor/googletest/googletest/**.hpp",
-        "SnowflaxTest/vendor/googletest/googletest/src/gtest-all.cc"
+		"%{prj.name}/vendor/googletest/googletest/**.h",
+        "%{prj.name}/vendor/googletest/googletest/**.hpp",
+        "%{prj.name}/vendor/googletest/googletest/src/gtest-all.cc"
 	}
 
 	includedirs {
 		"Snowflax/src",
 		"Snowflax/vendor/spdlog/include",
-		"SnowflaxTest/vendor/googletest/googletest/include",
-		"SnowflaxTest/vendor/googletest/googletest/"
+		"%{prj.name}/vendor/googletest/googletest/include",
+		"%{prj.name}/vendor/googletest/googletest/"
 
 	}
 
