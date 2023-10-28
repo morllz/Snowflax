@@ -49,7 +49,8 @@ project "Snowflax"
 	}
 
 	postbuildcommands {
-		("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+		("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox"),
+		("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/SnowflaxTest")
 	}
 
 	filter "configurations:Debug"
@@ -138,6 +139,10 @@ project "SnowflaxTest"
 
 	filter "system:windows"
 		cppdialect "C++20"
+
+	links {
+		"Snowflax"
+	}
 
 	defines {
 		"SFX_PLATFORM_WINDOWS"
