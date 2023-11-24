@@ -7,6 +7,4 @@
 
 #include "Snowflax/Application.h"
 
-#include "Snowflax/Infrastructure/IoC/Container.h"
-
 #include "Snowflax/Debug/Log.h"
