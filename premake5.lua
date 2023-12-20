@@ -148,16 +148,9 @@ project "SnowflaxTest"
 		"SFX_PLATFORM_WINDOWS"
 	}
 
-	filter "configurations:Debug"
-		defines "SFX_DEBUG"
-		symbols "On"
+	flags { "UnitTest" }
 
-	filter "configurations:Release"
-		defines "SFX_RELEASE"
-		optimize "On"
-
-	filter "configurations:Dist"
-		defines "SFX_DIST"
-		optimize "On"
+	defines "SFX_DEBUG"
+	symbols "On"
 
 -- Project "SnowflaxTest"
