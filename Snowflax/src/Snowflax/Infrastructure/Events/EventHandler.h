@@ -26,18 +26,18 @@ namespace Snowflax {
 				~EventHandler() = default;
 
 				virtual EventType GetEventType() override { return E::GetEventType(); }
-				virtual bool Handle(Event& _e) {
+				virtual bool Handle(Event& _e)  override {
 					for each (std::function<void, E&> func in m_Callbacks)
 					{
 						if (func) func((E&)_e);
 					}
 				}
-				virtual void Subscribe(std::function<void, E&> _func) {
+				virtual void Subscribe(std::function<void, E&> _func) override  {
 					if (std::find(m_Callbacks.begin(), m_Callbacks.end(), _func) == m_Callbacks.end()) {
 						m_Callbacks.push_back(_func);
 					}
 				}
-				virtual void Unsubscribe(std::function<void, E&> _func) {
+				virtual void Unsubscribe(std::function<void, E&> _func) override  {
 					auto pos = std::find(m_Callbacks.begin(), m_Callbacks.end(), _func) != m_Callbacks.end();
 					if (pos != m_Callbacks.end()) {
 						m_Callbacks.erase(pos);
