@@ -5,18 +5,18 @@
 
 
 namespace Snowflax {
-
 	namespace Infrastructure {
-
 		namespace Events {
+
+
 
 #define EVENT_CLASS_TYPE(type)	static EventType GetStaticType() { return EventType::##type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }
-#define EVENT_CLASS_CATEGORY(category, ...)	virtual int GetEventCategorys() const override { return category; }
+#define EVENT_CLASS_CATEGORY(category, ...)	virtual int GetEventCategorys() const override { return category; }\
 
 #define EVENT_CLASS_CALC_DERIVED(X, N, ...) N
 
-#define EVENT_CLASS(name, type, ...) \
+#define EVENT(name, type, ...) \
 	class __##name##_Type_Class : EVENT_CLASS_CALC_DERIVED(##__VA_ARGS__##, Event) { \
 	protected:\
 		__##name##_Type_Class() = default;\
@@ -26,6 +26,8 @@ namespace Snowflax {
 		EVENT_CLASS_CATEGORY(##__VA_ARGS__##)\
 	};\
 	class name : public __##name##_Type_Class
+
+
 
 			enum class EventType {
 				None = 0,
@@ -41,7 +43,7 @@ namespace Snowflax {
 				virtual EventType GetEventType() const = 0;
 				virtual int GetEventCategorys() const = 0;
 
-				inline bool IsInCategory(EventCategory _category) { return GetEventCategorys() & _category; }
+				inline bool InCategory(EventCategory _category) { return GetEventCategorys() & _category; }
 			};
 
 			template<class T>

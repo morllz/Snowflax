@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EventHandler.h"
-#include "EventListener.h"
+#include "IEventListener.h"
 #include <unordered_set>
 #include <memory>
 
