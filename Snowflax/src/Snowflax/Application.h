@@ -10,7 +10,7 @@ namespace Snowflax {
 		Application();
 		virtual ~Application();
 
-		void Run();
-		void Shutdown();
+		virtual void Run() = 0;
+		virtual void Shutdown() = 0;
 	};
 }

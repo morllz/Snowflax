@@ -3,15 +3,13 @@
 
 class SandboxApp : public Snowflax::Application {
 public:
-	SandboxApp() {
+	SandboxApp() = default;
+	~SandboxApp() = default;
 
-	}
-	~SandboxApp() {
-
-	}
-
+	void Run() {};
+	void Shutdown() {};
 };
 
-Snowflax::Application* CreateApplication() {
+Snowflax::Application* CreateApplication(int _argc, char** _argv) {
 	return new SandboxApp();
 }

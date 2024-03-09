@@ -145,12 +145,13 @@ project "SnowflaxTest"
 	}
 
 	defines {
-		"SFX_PLATFORM_WINDOWS"
+		"SFX_PLATFORM_WINDOWS",
+		"SFX_DEBUG",
+		"SFX_TEST"
 	}
 
 	flags { "UnitTest" }
 
-	defines "SFX_DEBUG"
 	symbols "On"
 
 -- Project "SnowflaxTest"
