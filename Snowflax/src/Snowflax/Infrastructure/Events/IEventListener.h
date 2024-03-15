@@ -7,10 +7,10 @@ namespace Snowflax {
 	namespace Infrastructure {
 		namespace Events {
 
-			class IEventListener {
+			class SNOWFLAX_API IEventListener {
 			protected:
 				IEventListener() = default;
-				~IEventListener() = default;
+				virtual ~IEventListener() = default;
 			public:
 				virtual void OnEvent(Event&) = 0;
 			};

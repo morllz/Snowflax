@@ -9,6 +9,6 @@
 #include "Snowflax/Application.h"
 
 #include "Snowflax/Infrastructure/Events/Event.h"
-#include "Snowflax/Infrastructure/Events/EventHandler.h"
+#include "Snowflax/Infrastructure/Events/EventDispatcher.h"
 
 #include "Snowflax/Debug/Log.h"

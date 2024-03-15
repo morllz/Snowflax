@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Snowflax/Core.h"
-//#include "EventDispatcher.h"
+#include <string>
 
 
 namespace Snowflax {
@@ -24,7 +24,7 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 #define EVENT_CLASS_CALC_DERIVED(X, N, ...) N
 
 #define EVENT(name, type, ...) \
-	class __##name##_Type_Class : public EVENT_CLASS_CALC_DERIVED(##__VA_ARGS__##, Event) { \
+	class SNOWFLAX_API __##name##_Type_Class : public EVENT_CLASS_CALC_DERIVED(##__VA_ARGS__##, Event) { \
 	protected:\
 		__##name##_Type_Class() = default;\
 		~__##name##_Type_Class() = default;\
@@ -32,27 +32,30 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 		EVENT_CLASS_TYPE(type)\
 		EVENT_CLASS_CATEGORY(##__VA_ARGS__##)\
 	};\
-	class name : public __##name##_Type_Class
+	class SNOWFLAX_API name : public __##name##_Type_Class
 // -----------------------------------------------------------------------------------------------------------------
 
 			enum class EventType {
 				None = 0,
-#ifdef SFX_DEBUG 
-				TestEvent
-#endif // SFX_DEBUG 
-
+				DummyEvent,
 			};
 
 			enum EventCategory {
 				None = BIT(0),
 			};
 
-			class Event {
+			class SNOWFLAX_API Event {
 			public:
+				Event() = default;
+				virtual ~Event() = default;
+
 				virtual EventType GetEventType() const = 0;
 				virtual int GetEventCategorys() const = 0;
 
 				inline bool InCategory(EventCategory _category) { return GetEventCategorys() & _category; }
+
+			protected:
+				std::string m_DebugName = "Event";
 			};
 
 			// Maybe remove this later if it creates more problems than it solves

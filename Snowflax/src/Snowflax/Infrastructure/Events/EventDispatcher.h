@@ -10,8 +10,11 @@ namespace Snowflax {
 	namespace Infrastructure {
 		namespace Events {
 
-			class EventDispatcher : public IEventListener {
+			class SNOWFLAX_API EventDispatcher : public IEventListener {
 			public:
+				EventDispatcher() = default;
+				~EventDispatcher() = default;
+
 				virtual void OnEvent(Event& _event) {
 					auto pos = std::find(m_EventsToListen.begin(), m_EventsToListen.end(), _event.GetEventType());
 					if (pos != m_EventsToListen.end()) {
@@ -19,42 +22,44 @@ namespace Snowflax {
 					}
 				}
 				void Dispatch(Event& _event) {
-					typename std::vector<std::shared_ptr<IEventHandler>>::iterator it;
+					typename std::vector<IEventHandler*>::iterator it;
 					for (it = m_RegisteredHandlers.begin(); it < m_RegisteredHandlers.end(); it++) {
-						(*it).get()->Handle(_event);
+						auto handler = *it;
+						if (handler->GetEventType() == _event.GetEventType()) handler->Handle(_event);
 					}
 				}
 				void Register(IEventHandler& _handler) {
-					auto handlerShared = std::make_shared<IEventHandler>(_handler);
-					if (std::find(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(), handlerShared) == m_RegisteredHandlers.end()) {
-						m_RegisteredHandlers.push_back(handlerShared);
+					if (std::find(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(), &_handler) == m_RegisteredHandlers.end()) {
+						m_RegisteredHandlers.push_back(&_handler);
 					}
 				}
 				void Unregister(IEventHandler& _handler) {
-					auto handlerShared = std::make_shared<IEventHandler>(_handler);
-					auto pos = std::find(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(),handlerShared);
+					auto pos = std::find(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(), &_handler);
 					if (pos != m_RegisteredHandlers.end()) {
 						m_RegisteredHandlers.erase(pos);
 					}
 				}
 				void operator+= (IEventHandler& _handler) {
 					Register(_handler);
-					UpdateListenEvents();
+					UpdateListenedEvents();
 				}
 				void operator-= (IEventHandler& _handler) {
 					Unregister(_handler);
 					m_EventsToListen.erase(_handler.GetEventType());
-					UpdateListenEvents();
+					UpdateListenedEvents();
+				}
+				void operator() (Event& _event) {
+					Dispatch(_event);
 				}
 			private:
-				void UpdateListenEvents() {
-					typename std::vector<std::shared_ptr<IEventHandler>>::iterator it;
+				void UpdateListenedEvents() {
+					typename std::vector<IEventHandler*>::iterator it;
 					for (it = m_RegisteredHandlers.begin(); it < m_RegisteredHandlers.end(); it++) {
-						m_EventsToListen.insert((*it).get()->GetEventType());
+						m_EventsToListen.insert((*it)->GetEventType());
 					}
 				}
 			private:
-				std::vector<std::shared_ptr<IEventHandler>> m_RegisteredHandlers;
+				std::vector<IEventHandler*> m_RegisteredHandlers;
 				std::unordered_set<EventType> m_EventsToListen;
 			};
 

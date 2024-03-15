@@ -9,16 +9,16 @@ namespace Snowflax {
 		namespace Events {
 
 
-			class IEventHandler {
+			class SNOWFLAX_API IEventHandler {
 			protected:
 				IEventHandler() = default;
-				~IEventHandler() = default;
+				virtual ~IEventHandler() = default;
 			public:
 				virtual EventType GetEventType() = 0;
 				virtual void Handle(Event&) = 0;
 			};
 			template<EventClass E>
-			class EventHandler : IEventHandler {
+			class SNOWFLAX_API EventHandler : public IEventHandler {
 			public:
 				EventHandler() = default;
 				~EventHandler() = default;
@@ -30,11 +30,11 @@ namespace Snowflax {
 						if(func) func(static_cast<E&>(_e));
 					}
 				}
-				virtual void Subscribe(std::function<void(E&)> _func) {
+				void Subscribe(std::function<void(E&)> _func) {
 					auto pos = std::find_if(m_Callbacks.begin(), m_Callbacks.end(), [&](auto f) { return f.target<void(E&)>() == _func.target<void(E&)>(); });
 					if (pos == m_Callbacks.end()) m_Callbacks.push_back(_func);
 				}
-				virtual void Unsubscribe(std::function<void(E&)> _func) {
+				void Unsubscribe(std::function<void(E&)> _func) {
 					auto pos = std::find_if(m_Callbacks.begin(), m_Callbacks.end(), [&](auto f) { return f.target<void(E&)>() == _func.target<void(E&)>(); });
 					if (pos != m_Callbacks.end()) m_Callbacks.erase(pos);
 				}
@@ -43,6 +43,9 @@ namespace Snowflax {
 				}
 				void operator-= (std::function<void(E&)> _func) {
 					Unsubscribe(_func);
+				}
+				void operator() (E& _event) {
+					Handle(_event);
 				}
 			private:
 				std::vector<std::function<void(E&)>> m_Callbacks;
