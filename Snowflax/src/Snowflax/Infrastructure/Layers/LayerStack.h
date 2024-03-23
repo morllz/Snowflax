@@ -14,18 +14,10 @@ namespace Snowflax {
 				LayerStack() = default;
 				~LayerStack() = default;
 
-				void PushLayer(Layer* _pLayer) {
-
-				}
-				void PopLayer(Layer* _pLayer) {
-
-				}
-				void PushOverlay(Layer* _pLayer) {
-
-				}
-				void PopOverlay(Layer* _pLayer) {
-
-				}
+				void PushLayer(Layer* _pLayer);
+				void PopLayer(Layer* _pLayer);
+				void PushOverlay(Layer* _pLayer);
+				void PopOverlay(Layer* _pLayer);
 
 			private:
 				LStack m_Layers;

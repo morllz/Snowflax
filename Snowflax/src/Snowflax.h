@@ -12,3 +12,5 @@
 #include "Snowflax/Infrastructure/Events/EventDispatcher.h"
 
 #include "Snowflax/Debug/Log.h"
+
+#include "Snowflax/Utils.h"
