@@ -3,27 +3,25 @@
 #include <Snowflax.h>
 #include <gtest/gtest.h>
 
-using namespace Snowflax::Infrastructure::Events;
 
+using namespace Snowflax;
 
 EVENT(SimpleDummyTestEvent, DummyEvent, None) {
 public:
-	SimpleDummyTestEvent() {
-		m_DummyData = true;
+	SimpleDummyTestEvent() : m_DummyData(true) {
+		
 	}
-	~SimpleDummyTestEvent() {
-
-	}
+	~SimpleDummyTestEvent() override = default;
 	bool m_DummyData = false;
 };
 
 TEST(EventSystemTests, SimpleEventIdentification) {
-	SimpleDummyTestEvent testEvent = SimpleDummyTestEvent(); // creating dummy test event
+	auto testEvent = SimpleDummyTestEvent(); // creating dummy test event
 
 	ASSERT_TRUE(testEvent.m_DummyData); // test correct creation
 
 	ASSERT_EQ(testEvent.GetEventType(), EventType::DummyEvent); // test correct event type
-	ASSERT_TRUE(testEvent.InCategory(None)); // test correct event category
+	ASSERT_TRUE(testEvent.InCategory(EventCategory::None)); // test correct event category
 }
 
 
@@ -33,10 +31,10 @@ void testDummyCallback(SimpleDummyTestEvent& _event) {
 }
 TEST(EventSystemTests, SimpleEventHandling) {
 	// creating dummy event and event handler
-	SimpleDummyTestEvent testEvent = SimpleDummyTestEvent();
-	EventHandler<SimpleDummyTestEvent> handler = EventHandler<SimpleDummyTestEvent>();
+	auto testEvent = SimpleDummyTestEvent();
+	auto handler = EventHandler<SimpleDummyTestEvent>();
 
-	handler += testDummyCallback; // subcribe dummy callback
+	handler += testDummyCallback; // subscribe dummy callback
 
 	handler.Handle(testEvent); 
 	ASSERT_FALSE(testEvent.m_DummyData); // check if callback got called
@@ -52,9 +50,9 @@ TEST(EventSystemTests, SimpleEventHandling) {
 
 TEST(EventSystemTests, SimpleEventDispatching) {
 	// creating dummy event and event handler
-	SimpleDummyTestEvent testEvent = SimpleDummyTestEvent();
-	EventHandler<SimpleDummyTestEvent> handler = EventHandler<SimpleDummyTestEvent>();
-	EventDispatcher dispatcher = EventDispatcher();
+	auto testEvent = SimpleDummyTestEvent();
+	auto handler = EventHandler<SimpleDummyTestEvent>();
+	auto dispatcher = EventDispatcher();
 	dispatcher += handler;
 
 	handler += testDummyCallback; // subcribe dummy callback

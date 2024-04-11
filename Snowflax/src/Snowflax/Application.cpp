@@ -1,19 +1,16 @@
 #include "Application.h"
 
 
-namespace Snowflax {
 
-	Application::Application() {
+void Snowflax::Application::Run ()
+{
 
-	}
-	Application::~Application() {
+}
 
-	}
+void Snowflax::Application::Shutdown() {
 
-	void Application::Run() {
+}
 
-	}
-	void Application::Shutdown() {
+void Snowflax::Application::OnEvent(Event&) {
 
-	}
 }

@@ -1,18 +1,14 @@
 #pragma once
 
-#include "Snowflax/Infrastructure/Events/EventDispatcher.h"
+#include "Snowflax/Events/EventDispatcher.h"
 
-
-using namespace Snowflax::Infrastructure::Events;
 
 namespace Snowflax {
-	namespace Infrastructure {
-		namespace Layers {
 
-			class SNOWFLAX_API Layer : public EventDispatcher {
+			class Layer : public EventDispatcher {
 			public:
 				Layer() = default;
-				virtual ~Layer() = default;
+				~Layer() override = default;
 
 				virtual void OnAttach() const = 0;
 				virtual void OnDetatch() const = 0;
@@ -23,6 +19,4 @@ namespace Snowflax {
 			};
 
 			
-		}
-	}
 }

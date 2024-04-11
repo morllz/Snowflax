@@ -8,8 +8,8 @@
 
 #include "Snowflax/Application.h"
 
-#include "Snowflax/Infrastructure/Events/Event.h"
-#include "Snowflax/Infrastructure/Events/EventDispatcher.h"
+#include "Snowflax/Events/Event.h"
+#include "Snowflax/Events/EventDispatcher.h"
 
 #include "Snowflax/Debug/Log.h"
 

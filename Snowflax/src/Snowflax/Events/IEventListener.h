@@ -4,10 +4,8 @@
 
 
 namespace Snowflax {
-	namespace Infrastructure {
-		namespace Events {
 
-			class SNOWFLAX_API IEventListener {
+			class IEventListener {
 			protected:
 				IEventListener() = default;
 				virtual ~IEventListener() = default;
@@ -15,6 +13,4 @@ namespace Snowflax {
 				virtual void OnEvent(Event&) = 0;
 			};
 
-		}
-	}
 }

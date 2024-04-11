@@ -22,8 +22,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 project "Snowflax"
 	location "Snowflax"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
+	cppdialect "C++20"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -39,31 +41,25 @@ project "Snowflax"
 	}
 
 	filter "system:windows"
-		cppdialect "C++20"
-		staticruntime "On"
 		systemversion "latest"
 
 	defines {
 		"SFX_PLATFORM_WINDOWS",
-		"SFX_BUILD_DLL"
-	}
-
-	postbuildcommands {
-		("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox"),
-		("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/SnowflaxTest")
+		"SFX_CORE",
+		"_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING"
 	}
 
 	filter "configurations:Debug"
 		defines "SFX_DEBUG"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "SFX_RELEASE"
-		optimize "On"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "SFX_DIST"
-		optimize "On"
+		optimize "on"
 
 -- Project "Snowflax"
 
@@ -73,6 +69,8 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++20"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -88,7 +86,7 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++20"
+		systemversion "latest"
 
 	links {
 		"Snowflax"
@@ -100,15 +98,15 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "SFX_DEBUG"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "SFX_RELEASE"
-		optimize "On"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "SFX_DIST"
-		optimize "On"
+		optimize "on"
 
 -- Project "Sandbox"
 
@@ -117,6 +115,8 @@ project "SnowflaxTest"
 	location "SnowflaxTest"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++20"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -138,7 +138,7 @@ project "SnowflaxTest"
 	}
 
 	filter "system:windows"
-		cppdialect "C++20"
+		systemversion "latest"
 
 	links {
 		"Snowflax"

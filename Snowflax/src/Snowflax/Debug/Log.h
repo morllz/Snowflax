@@ -1,8 +1,6 @@
 #pragma once
 
 
-#ifdef SFX_FLAG_DEBUG
-
 #include <memory>
 
 #include "Snowflax/Core.h"
@@ -10,32 +8,37 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-// ------------- LOGGING PATTERNS ----------------------
-#define SFX_CORE_LOG_PATTERN "%T.%e [%n] %^%v%$"
-// -----------------------------------------------------
+// ------------- LOGGING PATTERNS -------------------------
+constexpr auto SFX_CORE_LOG_PATTERN = "%T.%e [%n] %^%v%$";
+// --------------------------------------------------------
 
-#define DEF_COLOR_SINK_MT(name, level, pattern, R, G, B) \
-	auto name = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();\
-	name->set_level(level);\
-	name->set_pattern(pattern);\
-	name->set_color(level, COLOR16_FROM_RGB(R, G, B))
+
+#ifdef SFX_CORE
+#define SFX_GET_LOGGER Snowflax::Log::GetCoreConsole()
+#endif // SFX_CORE
+#ifndef SFX_CORE
+#define SFX_GET_LOGGER Snowflax::Log::GetClientConsole()
+#endif // !SFX_CORE
+
+#define SFX_LOG_INFO(...)		SFX_GET_LOGGER->info(__VA_ARGS__)
+#define SFX_LOG_DEBUG(...)		SFX_GET_LOGGER->debug(__VA_ARGS__)
+#define SFX_LOG_WARN(...)		SFX_GET_LOGGER->warn(__VA_ARGS__)
+#define SFX_LOG_ERROR(...)		SFX_GET_LOGGER->error(__VA_ARGS__)
+#define SFX_LOG_CRITICAL(...)	SFX_GET_LOGGER->critical(__VA_ARGS__)
 
 
 namespace Snowflax {
-	namespace Debug {
 
-		class SNOWFLAX_API Log {
+		class Log {
 		public:
-			static int Init();
+			static void Init();
 
-			static std::shared_ptr<spdlog::logger> GetCoreConsole();
-			static std::shared_ptr<spdlog::logger> GetClientConsole();
+			static std::shared_ptr<spdlog::logger>& GetCoreConsole();
+			static std::shared_ptr<spdlog::logger>& GetClientConsole();
+
 
 		private:
-			static std::shared_ptr<spdlog::logger> m_sCoreLogger;
-			static std::shared_ptr<spdlog::logger> m_sClientLogger;
+			inline static std::shared_ptr<spdlog::logger> m_sCoreLogger;
+			inline static std::shared_ptr<spdlog::logger> m_sClientLogger;
 		};
 	}
-};
-
-#endif // SFX_FLAG_DEBUG

@@ -1,21 +1,19 @@
 #pragma once
 
 #include "Core.h"
-#include "Infrastructure/Events/IEventListener.h"
+#include "Events/IEventListener.h"
+#include "Debug/Log.h"
 
-
-using namespace Snowflax::Infrastructure::Events;
 
 namespace Snowflax {
 
-	class SNOWFLAX_API Application : IEventListener {
+	class Application : public IEventListener {
 	public:
-		Application();
-		virtual ~Application();
+		Application() = default;
+		~Application() override = default;
 
-		void OnEvent(Event& _event);
-
-		virtual void Run() = 0;
-		virtual void Shutdown() = 0;
+		virtual void Run();
+		virtual void Shutdown();
+		virtual void OnEvent(Event&);
 	};
 }
