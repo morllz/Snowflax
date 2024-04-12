@@ -6,61 +6,32 @@
 
 namespace Snowflax {
 
+	class IEventHandler {
+	protected:
+		IEventHandler() = default;
+		virtual ~IEventHandler() = default;
+	public:
+		virtual EventType GetEventType() = 0;
+		virtual void Handle(Event&) = 0;
+	};
 
-			class IEventHandler {
-			protected:
-				IEventHandler() = default;
-				virtual ~IEventHandler() = default;
-			public:
-				virtual EventType GetEventType() = 0;
-				virtual void Handle(Event&) = 0;
-			};
-			template<EventClass E>
-			class EventHandler : public IEventHandler {
-			public:
-				EventHandler() = default;
-				~EventHandler() override = default;
+	template<EventClass E>
+	class EventHandler : public IEventHandler {
+	public:
+		EventHandler() = default;
+		~EventHandler() override = default;
 
-				virtual EventType GetEventType()
-				{
-					return E::GetStaticType();
-				}
+		virtual EventType GetEventType();
 
-				virtual void Handle(Event& _e)
-				{
-					for (auto& func : m_Callbacks)
-					{
-						if (func) func(static_cast<E&>(_e));
-					}
-				}
+		virtual void Handle(Event& _e);
 
-				void Subscribe(std::function<void(E&)> _func)
-				{
-					auto pos = std::ranges::find_if(m_Callbacks.begin(), m_Callbacks.end(), [&](auto f) { return f.target<void(E&)>() == _func.target<void(E&)>(); });
-					if (pos == m_Callbacks.end()) m_Callbacks.push_back(_func);
-				}
+		void Subscribe(std::function<void(E&)> _func);
+		void Unsubscribe(std::function<void(E&)> _func);
+		void operator+=(std::function<void(E&)> _func);
+		void operator-=(std::function<void(E&)> _func);
 
-				void Unsubscribe(std::function<void(E&)> _func)
-				{
-					auto pos = std::ranges::find_if(m_Callbacks.begin(), m_Callbacks.end(), [&](auto f) { return f.target<void(E&)>() == _func.target<void(E&)>(); });
-					if (pos != m_Callbacks.end()) m_Callbacks.erase(pos);
-				}
-
-				void operator+=(std::function<void(E&)> _func)
-				{
-					Subscribe(_func);
-				}
-
-				void operator-=(std::function<void(E&)> _func)
-				{
-					Unsubscribe(_func);
-				}
-
-				void operator() (E& _event) {
-					Handle(_event);
-				}
-			private:
-				std::vector<std::function<void(E&)>> m_Callbacks;
-			};
-
-		}
+		void operator() (E& _event);
+	private:
+		std::vector<std::function<void(E&)>> m_Callbacks;
+	};
+}

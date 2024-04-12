@@ -45,8 +45,7 @@ project "Snowflax"
 
 	defines {
 		"SFX_PLATFORM_WINDOWS",
-		"SFX_CORE",
-		"_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING"
+		"SFX_CORE"
 	}
 
 	filter "configurations:Debug"

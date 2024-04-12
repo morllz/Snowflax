@@ -29,16 +29,16 @@ constexpr auto SFX_CORE_LOG_PATTERN = "%T.%e [%n] %^%v%$";
 
 namespace Snowflax {
 
-		class Log {
-		public:
-			static void Init();
+	class Log {
+	public:
 
-			static std::shared_ptr<spdlog::logger>& GetCoreConsole();
-			static std::shared_ptr<spdlog::logger>& GetClientConsole();
+		static void Init();
 
+		static std::shared_ptr<spdlog::logger>& GetCoreConsole();
+		static std::shared_ptr<spdlog::logger>& GetClientConsole();
 
-		private:
-			inline static std::shared_ptr<spdlog::logger> m_sCoreLogger;
-			inline static std::shared_ptr<spdlog::logger> m_sClientLogger;
-		};
-	}
+	private:
+		inline static std::shared_ptr<spdlog::logger> m_sCoreLogger;
+		inline static std::shared_ptr<spdlog::logger> m_sClientLogger;
+	};
+}
