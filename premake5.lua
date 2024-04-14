@@ -1,3 +1,5 @@
+include "./vendor/premake/custom/solution_items.lua"
+
 workspace "Snowflax"
 	architecture "x64"
 
@@ -7,13 +9,17 @@ workspace "Snowflax"
 		"Dist"
 	}
 
-	files {
+	solution_items {
 		"premake5.lua",
 		".gitignore",
 		".gitmodules"
 	}
 
 	startproject "Sandbox"
+
+	defines {
+		"_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS"
+	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -25,7 +31,7 @@ project "Snowflax"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -69,7 +75,7 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -115,7 +121,7 @@ project "SnowflaxTest"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")

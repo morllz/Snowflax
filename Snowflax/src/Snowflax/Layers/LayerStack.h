@@ -11,7 +11,7 @@ namespace Snowflax {
 		using LIterator = LStack::iterator;
 	public:
 		LayerStack();
-		~LayerStack() override = default;
+		~LayerStack() override;
 
 		void OnEvent(Event& _event) override;
 		void Update();

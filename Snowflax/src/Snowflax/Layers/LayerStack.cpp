@@ -8,6 +8,14 @@ Snowflax::LayerStack::LayerStack()
 	m_FirstLayerPos = m_Layers.end();
 }
 
+LayerStack::~LayerStack()
+{
+	for (auto layer : m_Layers) {
+		layer->OnDetatch();
+	}
+	m_Layers.clear();
+}
+
 void LayerStack::OnEvent(Event& _event)
 {
 	for (auto layer : m_Layers) {

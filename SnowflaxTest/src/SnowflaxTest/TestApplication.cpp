@@ -12,8 +12,8 @@ public:
 
         RUN_ALL_TESTS();
     }
-    void Shutdown();
-    void OnEvent(Snowflax::Event&);
+    void Shutdown() {}
+    void OnEvent(Snowflax::Event&) {}
 private:
     int m_argc;
     char** m_argv;

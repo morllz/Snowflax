@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Snowflax/Core.h"
 #include "Snowflax/Utils.h"
 #include <string>
 
@@ -32,30 +31,30 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 	class name : public __##name##_Type_Class
 // -----------------------------------------------------------------------------------------------------------------
 
-			enum class EventType {
-				None = 0,
-				DummyEvent,
-			};
+	enum class EventType {
+		None = 0,
+		DummyEvent,
+	};
 
-			enum class EventCategory {
-				None = BIT(0),
-			};
+	enum class EventCategory {
+		None = BIT(0),
+	};
 
-			class Event {
-			public:
-				Event() = default;
-				virtual ~Event() = default;
+	class Event {
+	public:
+		Event() = default;
+		virtual ~Event() = default;
 
-				virtual EventType GetEventType() const = 0;
-				virtual int GetEventCategorys() const = 0;
+		virtual EventType GetEventType() const = 0;
+		virtual int GetEventCategorys() const = 0;
 
-				inline bool InCategory(EventCategory _category) const { return GetEventCategorys() & (int)_category; }
+		inline bool InCategory(EventCategory _category) const { return GetEventCategorys() & (int)_category; }
 
-				std::string m_DebugName = "Event";
-			};
+		std::string m_DebugName = "Event";
+	};
 
-			// Maybe remove this later if it creates more problems than it solves
-			template<class T>
-			concept EventClass = std::is_convertible_v<T*, Event*>;
-
+	// Maybe remove this later if it creates more problems than it solves
+	template<class T>
+	concept EventClass = std::is_convertible_v<T*, Event*>;
+	
 }

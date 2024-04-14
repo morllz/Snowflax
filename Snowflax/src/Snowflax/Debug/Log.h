@@ -3,8 +3,6 @@
 
 #include <memory>
 
-#include "Snowflax/Core.h"
-#include "Snowflax/Utils.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 

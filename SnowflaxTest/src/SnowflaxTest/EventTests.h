@@ -32,38 +32,17 @@ void testDummyCallback(SimpleDummyTestEvent& _event) {
 TEST(EventSystemTests, SimpleEventHandling) {
 	// creating dummy event and event handler
 	auto testEvent = SimpleDummyTestEvent();
-	auto handler = EventHandler<SimpleDummyTestEvent>();
-
-	handler += testDummyCallback; // subscribe dummy callback
+	auto handler = EventHandler<SimpleDummyTestEvent>(testDummyCallback);
 
 	handler.Handle(testEvent); 
 	ASSERT_FALSE(testEvent.m_DummyData); // check if callback got called
-
-	// check for working unsubscribing
-	testEvent.m_DummyData = true;
-	handler -= testDummyCallback;
-	handler.Handle(testEvent);
-	ASSERT_TRUE(testEvent.m_DummyData);
-
-
 }
 
 TEST(EventSystemTests, SimpleEventDispatching) {
-	// creating dummy event and event handler
 	auto testEvent = SimpleDummyTestEvent();
-	auto handler = EventHandler<SimpleDummyTestEvent>();
 	auto dispatcher = EventDispatcher();
-	dispatcher += handler;
+	dispatcher.Subscribe<SimpleDummyTestEvent>(testDummyCallback);
 
-	handler += testDummyCallback; // subcribe dummy callback
-
-	dispatcher.Dispatch(testEvent);
-	ASSERT_FALSE(testEvent.m_DummyData); // check if callback got called
-
-	// check for working unsubscribing
-	testEvent.m_DummyData = true;
-	dispatcher -= handler;
-	dispatcher.Dispatch(testEvent);
-	ASSERT_TRUE(testEvent.m_DummyData);
+	dispatcher(testEvent);
+	ASSERT_FALSE(testEvent.m_DummyData);
 }
-

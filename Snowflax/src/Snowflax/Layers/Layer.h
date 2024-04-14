@@ -14,7 +14,7 @@ namespace Snowflax {
 		virtual void OnDetatch() const = 0;
 		virtual void OnUpdate() const = 0;
 
-		bool isOverlay() const { return m_IsOverlay; }
+		bool isOverlay() const { return m_Overlay; }
 		bool isEnabled() const { return m_Enabled; }
 
 		explicit(false) operator bool() const { return isEnabled(); }
@@ -23,6 +23,6 @@ namespace Snowflax {
 
 	private:
 		bool m_Enabled = false;
-		bool m_IsOverlay = false;
+		bool m_Overlay = false;
 	};
 }

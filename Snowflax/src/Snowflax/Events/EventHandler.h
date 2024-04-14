@@ -2,6 +2,7 @@
 
 #include "Event.h"
 #include <vector>
+#include <functional>
 
 
 namespace Snowflax {
@@ -18,20 +19,27 @@ namespace Snowflax {
 	template<EventClass E>
 	class EventHandler : public IEventHandler {
 	public:
-		EventHandler() = default;
+
+		explicit EventHandler(std::function<void(E&)> _func) : m_Callback(_func) {}
 		~EventHandler() override = default;
 
-		virtual EventType GetEventType();
+		EventType GetEventType() override
+		{
+			return E::GetStaticType();
+		}
 
-		virtual void Handle(Event& _e);
+		void Handle(Event& _e) override
+		{
+			if (m_Callback) m_Callback(static_cast<E&>(_e));
+		}
 
-		void Subscribe(std::function<void(E&)> _func);
-		void Unsubscribe(std::function<void(E&)> _func);
-		void operator+=(std::function<void(E&)> _func);
-		void operator-=(std::function<void(E&)> _func);
+		std::function<void(E&)> GetCallback()
+		{
+			return m_Callback;
+		}
 
-		void operator() (E& _event);
 	private:
-		std::vector<std::function<void(E&)>> m_Callbacks;
+		std::function<void(E&)> m_Callback;
 	};
+
 }

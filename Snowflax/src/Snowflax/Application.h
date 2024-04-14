@@ -1,19 +1,24 @@
 #pragma once
 
-#include "Core.h"
-#include "Events/IEventListener.h"
+#include "Layers/LayerStack.h"
 #include "Debug/Log.h"
 
 
 namespace Snowflax {
 
-	class Application : public IEventListener {
+	class Application : public EventDispatcher {
 	public:
 		Application() = default;
 		~Application() override = default;
 
 		virtual void Run();
 		virtual void Shutdown();
-		virtual void OnEvent(Event&);
+		void OnEvent(Event& _event) override;
+		virtual bool isRunning() { return m_IsRunning; }
+	
+	private:
+		LayerStack m_LayerStack;
+
+		bool m_IsRunning = false;
 	};
 }
