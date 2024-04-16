@@ -11,7 +11,7 @@ Snowflax::LayerStack::LayerStack()
 LayerStack::~LayerStack()
 {
 	for (auto layer : m_Layers) {
-		layer->OnDetatch();
+		layer->OnDetach();
 	}
 	m_Layers.clear();
 }
@@ -32,7 +32,7 @@ void Snowflax::LayerStack::Update()
 
 void LayerStack::PushLayer(Layer* _pLayer)
 {
-	if (_pLayer->isOverlay()) return;
+	if (_pLayer->IsOverlay()) return;
 	if (const auto pos = std::find(m_FirstLayerPos, m_Layers.end(), _pLayer); 
 		pos != m_Layers.end()) return;
 
@@ -42,17 +42,17 @@ void LayerStack::PushLayer(Layer* _pLayer)
 
 void LayerStack::PopLayer(Layer* _pLayer)
 {
-	if (_pLayer->isOverlay()) return;
+	if (_pLayer->IsOverlay()) return;
 	if (const auto pos = std::find(m_FirstLayerPos, m_Layers.end(), _pLayer); 
 		pos != m_Layers.end()) m_Layers.erase(pos);
 
-	m_FirstLayerPos = std::find_if(m_FirstLayerPos, m_Layers.end(), [](Layer const* layer) { return !layer->isOverlay(); });
-	_pLayer->OnDetatch();
+	m_FirstLayerPos = std::find_if(m_FirstLayerPos, m_Layers.end(), [](Layer const* layer) { return !layer->IsOverlay(); });
+	_pLayer->OnDetach();
 }
 
 void LayerStack::PushOverlay(Layer* _pLayer)
 {
-	if (!_pLayer->isOverlay()) return;
+	if (!_pLayer->IsOverlay()) return;
 	if (const auto pos = std::find(m_Layers.begin(), m_FirstLayerPos, _pLayer);
 		pos != m_Layers.end()) return;
 
@@ -62,9 +62,9 @@ void LayerStack::PushOverlay(Layer* _pLayer)
 
 void LayerStack::PopOverlay(Layer* _pLayer)
 {
-	if (!_pLayer->isOverlay()) return;
+	if (!_pLayer->IsOverlay()) return;
 	if (const auto pos = std::find(m_Layers.begin(), m_FirstLayerPos, _pLayer);
 		pos != m_Layers.end()) m_Layers.erase(pos);
 
-	_pLayer->OnDetatch();
+	_pLayer->OnDetach();
 }

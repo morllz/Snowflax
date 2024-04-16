@@ -14,7 +14,7 @@ namespace Snowflax {
 		virtual void Run();
 		virtual void Shutdown();
 		void OnEvent(Event& _event) override;
-		virtual bool isRunning() { return m_IsRunning; }
+		virtual bool IsRunning() { return m_IsRunning; }
 	
 	private:
 		LayerStack m_LayerStack;

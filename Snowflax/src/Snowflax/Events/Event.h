@@ -15,7 +15,7 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 // ---------------------- event definition macro -------------------------------------------------------------------
 #define EVENT_CLASS_TYPE(type)	static EventType GetStaticType() { return EventType::##type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }
-#define EVENT_CLASS_CATEGORY(category, ...)	virtual int GetEventCategorys() const override { return (int)EventCategory::category; }\
+#define EVENT_CLASS_CATEGORY(category, ...)	virtual int GetEventCategories() const override { return (int)EventCategory::category; }\
 
 #define EVENT_CLASS_CALC_DERIVED(X, N, ...) N
 
@@ -46,11 +46,9 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 		virtual ~Event() = default;
 
 		virtual EventType GetEventType() const = 0;
-		virtual int GetEventCategorys() const = 0;
+		virtual int GetEventCategories() const = 0;
 
-		inline bool InCategory(EventCategory _category) const { return GetEventCategorys() & (int)_category; }
-
-		std::string m_DebugName = "Event";
+		inline bool InCategory(EventCategory _category) const { return GetEventCategories() & static_cast<int>(_category); }
 	};
 
 	// Maybe remove this later if it creates more problems than it solves

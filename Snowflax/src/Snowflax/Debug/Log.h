@@ -7,7 +7,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 // ------------- LOGGING PATTERNS -------------------------
-constexpr auto SFX_CORE_LOG_PATTERN = "%T.%e [%n] %^%v%$";
+#define SFX_CORE_LOG_PATTERN "%T.%e [%n] %^%v%$"
 // --------------------------------------------------------
 
 

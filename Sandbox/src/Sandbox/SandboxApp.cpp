@@ -1,7 +1,7 @@
 #include <Snowflax.h>
 
 
-class SandboxApp : public Snowflax::Application {
+class SandboxApp final : public Snowflax::Application {
 public:
 	SandboxApp() = default;
 	~SandboxApp() override = default;

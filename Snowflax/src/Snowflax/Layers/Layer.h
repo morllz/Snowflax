@@ -11,13 +11,13 @@ namespace Snowflax {
 		~Layer() override = default;
 
 		virtual void OnAttach() const = 0;
-		virtual void OnDetatch() const = 0;
+		virtual void OnDetach() const = 0;
 		virtual void OnUpdate() const = 0;
 
-		bool isOverlay() const { return m_Overlay; }
-		bool isEnabled() const { return m_Enabled; }
+		bool IsOverlay() const { return m_Overlay; }
+		bool IsEnabled() const { return m_Enabled; }
 
-		explicit(false) operator bool() const { return isEnabled(); }
+		explicit operator bool() const { return IsEnabled(); }
 		virtual void Enable() { m_Enabled = true; }
 		virtual void Disable() { m_Enabled = false; }
 
