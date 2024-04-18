@@ -25,10 +25,17 @@ TEST(EventSystemTests, SimpleEventIdentification) {
 }
 
 
-// Part of following SimpleEventHandling and SimpleEventDispatching test. Essential for execution. Simple function to work as dummy callback
+// Part of following SimpleEventHandling and SimpleEventDispatching test. Essential for execution. Simple function and class to work as dummies
 void testDummyCallback(SimpleDummyTestEvent& _event) {
 	_event.m_DummyData = false;
 }
+class testDummyCallbackClass {
+public:
+	void Callback(SimpleDummyTestEvent& _event)
+	{
+		testDummyCallback(_event);
+	}
+};
 TEST(EventSystemTests, SimpleEventHandling) {
 	// creating dummy event and event handler
 	auto testEvent = SimpleDummyTestEvent();
@@ -42,6 +49,17 @@ TEST(EventSystemTests, SimpleEventDispatching) {
 	auto testEvent = SimpleDummyTestEvent();
 	auto dispatcher = EventDispatcher();
 	dispatcher.Subscribe<SimpleDummyTestEvent>(testDummyCallback);
+
+	dispatcher(testEvent);
+	ASSERT_FALSE(testEvent.m_DummyData);
+}
+TEST(EventSystemTests, InObjectEventDispatching)
+{
+	auto testEvent = SimpleDummyTestEvent();
+	auto dispatcher = EventDispatcher();
+	auto obj = testDummyCallbackClass();
+
+	dispatcher.Subscribe<SimpleDummyTestEvent, testDummyCallbackClass>(&testDummyCallbackClass::Callback, &obj);
 
 	dispatcher(testEvent);
 	ASSERT_FALSE(testEvent.m_DummyData);

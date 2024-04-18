@@ -34,10 +34,12 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 	enum class EventType {
 		None = 0,
 		DummyEvent,
+		WindowClosedEvent
 	};
 
 	enum class EventCategory {
 		None = BIT(0),
+		WindowEvents = BIT(1),
 	};
 
 	class Event {

@@ -31,6 +31,12 @@ namespace Snowflax {
 			Dispatch(_event);
 		}
 
+		template<EventClass E, class C>
+		void Subscribe(void(C::* _func)(E&), C* _objTarget)
+		{
+			// this works but may result in objects of same type not being able to sub the same function to same event dispatcher
+			Subscribe<E>(std::bind_front(_func, _objTarget));
+		}
 		template<EventClass E>
 		void Subscribe(std::function<void(E&)> _func)
 		{
