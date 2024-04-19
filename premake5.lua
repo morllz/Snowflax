@@ -42,9 +42,12 @@ project "Snowflax"
 	}
 
 	includedirs {
-		"Snowflax/src",
-		"Snowflax/vendor/spdlog/include"
+		"%{prj.name}/src",
+		"%{prj.name}/vendor/spdlog/include"
 	}
+
+	pchheader "SFXpch.h"
+	pchsource "%{prj.name}/src/SFXpch.cpp"
 
 	filter "system:windows"
 		systemversion "latest"

@@ -1,10 +1,5 @@
 #pragma once
 
-#include <string>
-#include <functional>
-#include <memory>
-
-
 #ifdef SFX_PLATFORM_WINDOWS
 
 #else

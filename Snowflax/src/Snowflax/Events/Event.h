@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Snowflax/Utils.h"
-#include <string>
 
 
 namespace Snowflax {

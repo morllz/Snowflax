@@ -2,9 +2,6 @@
 
 #include "EventHandler.h"
 #include "IEventListener.h"
-#include <unordered_set>
-#include <memory>
-
 
 namespace Snowflax {
 

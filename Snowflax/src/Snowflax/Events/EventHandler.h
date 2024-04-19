@@ -1,8 +1,7 @@
 #pragma once
 
+#include "SFXpch.h"
 #include "Event.h"
-#include <vector>
-#include <functional>
 
 
 namespace Snowflax {

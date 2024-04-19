@@ -1,7 +1,7 @@
 #pragma once
 
+#include "SFXpch.h"
 #include "Layer.h"
-#include <vector>
 
 
 namespace Snowflax {
