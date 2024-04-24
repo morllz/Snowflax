@@ -14,7 +14,6 @@ void Snowflax::Application::Run ()
 	while (m_IsRunning)
 	{
 		m_LayerStack.Update();
-		SFX_LOG_INFO("bobo");
 	}
 
 }

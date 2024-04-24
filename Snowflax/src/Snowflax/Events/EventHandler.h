@@ -18,8 +18,14 @@ namespace Snowflax {
 	template<EventClass E>
 	class EventHandler : public IEventHandler {
 	public:
-
-		explicit EventHandler(std::function<void(E&)> _func) : m_Callback(_func) {}
+		explicit EventHandler(void(* _func)(E&)) : m_Callback(_func) {}
+		template <class C, EventClass E>
+		explicit EventHandler(void(C::* _func)(E&), C* _targetObj)
+		{
+			m_Callback = std::bind_front(_func, _targetObj);
+			m_CallbackIsMember = true;
+			m_TargetObj = _targetObj;
+		}
 		~EventHandler() override = default;
 
 		EventType GetEventType() override
@@ -32,13 +38,22 @@ namespace Snowflax {
 			if (m_Callback) m_Callback(static_cast<E&>(_e));
 		}
 
-		std::function<void(E&)> GetCallback()
+		std::function<void(E&)> GetCallback() const
 		{
 			return m_Callback;
+		}
+		bool IsCallbackMember() const
+		{
+			return m_CallbackIsMember;
+		}
+		void* GetTargetObject() const
+		{
+			return m_TargetObj;
 		}
 
 	private:
 		std::function<void(E&)> m_Callback;
+		bool m_CallbackIsMember = false;
+		void* m_TargetObj = nullptr;
 	};
-
 }
