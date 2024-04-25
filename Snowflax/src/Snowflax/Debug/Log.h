@@ -1,9 +1,13 @@
 #pragma once
 
 #include "SFXpch.h"
+
+
+#ifndef SFX_DIST
+
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-// ------------- LOGGING PATTERNS -------------------------
+// ------------- LOGGING PATTERN --------------------------
 #define SFX_CORE_LOG_PATTERN "%T.%e [%n] %^%v%$"
 // --------------------------------------------------------
 
@@ -37,3 +41,13 @@ namespace Snowflax {
 		inline static std::shared_ptr<spdlog::logger> m_sClientLogger;
 	};
 }
+
+#else
+
+#define SFX_LOG_INFO(...)	
+#define SFX_LOG_DEBUG(...)	
+#define SFX_LOG_WARN(...)	
+#define SFX_LOG_ERROR(...)	
+#define SFX_LOG_CRITICAL(...)
+
+#endif // SFX_DIST

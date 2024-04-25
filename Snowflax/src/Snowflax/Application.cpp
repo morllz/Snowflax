@@ -29,5 +29,5 @@ void Snowflax::Application::OnEvent(Event& _event) {
 
 void Snowflax::Application::WindowClosed(WindowClosedEvent& _event)
 {
-
+	m_IsRunning = false;
 }
