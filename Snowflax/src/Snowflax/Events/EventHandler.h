@@ -3,7 +3,6 @@
 #include "SFXpch.h"
 #include "Event.h"
 
-
 namespace Snowflax {
 
 	class IEventHandler {
@@ -18,42 +17,20 @@ namespace Snowflax {
 	template<EventClass E>
 	class EventHandler : public IEventHandler {
 	public:
-		explicit EventHandler(void(* _func)(E&)) : m_Callback(_func) {}
-		template <class C, EventClass E>
-		explicit EventHandler(void(C::* _func)(E&), C* _targetObj)
-		{
-			m_Callback = std::bind_front(_func, _targetObj);
-			m_CallbackIsMember = true;
-			m_TargetObj = _targetObj;
-		}
+		template<class C>
+		EventHandler(std::function<void(const C&, E&)> _func, C* _targetObj) : m_Callback(std::bind_front(_func, _targetObj)) {}
+		explicit EventHandler(std::function<void(E&)> _func) : m_Callback(_func) {}
 		~EventHandler() override = default;
-
-		EventType GetEventType() override
-		{
-			return E::GetStaticType();
-		}
 
 		void Handle(Event& _e) override
 		{
 			if (m_Callback) m_Callback(static_cast<E&>(_e));
 		}
-
-		std::function<void(E&)> GetCallback() const
+		EventType GetEventType() override
 		{
-			return m_Callback;
+			return E::GetStaticType();
 		}
-		bool IsCallbackMember() const
-		{
-			return m_CallbackIsMember;
-		}
-		void* GetTargetObject() const
-		{
-			return m_TargetObj;
-		}
-
 	private:
 		std::function<void(E&)> m_Callback;
-		bool m_CallbackIsMember = false;
-		void* m_TargetObj = nullptr;
 	};
 }

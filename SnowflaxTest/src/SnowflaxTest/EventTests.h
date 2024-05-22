@@ -31,7 +31,7 @@ void testDummyCallback(SimpleDummyTestEvent& _event) {
 }
 class testDummyCallbackClass {
 public:
-	void Callback(SimpleDummyTestEvent& _event)
+	void Callback(SimpleDummyTestEvent& _event) const
 	{
 		testDummyCallback(_event);
 	}
@@ -50,7 +50,7 @@ TEST(EventSystemTests, SimpleEventDispatching) {
 	auto dispatcher = EventDispatcher();
 	dispatcher.Subscribe<SimpleDummyTestEvent>(testDummyCallback);
 
-	dispatcher(testEvent);
+	dispatcher.Send(testEvent);
 	ASSERT_FALSE(testEvent.m_DummyData);
 }
 TEST(EventSystemTests, InObjectEventDispatching)
@@ -61,6 +61,6 @@ TEST(EventSystemTests, InObjectEventDispatching)
 
 	dispatcher.Subscribe<SimpleDummyTestEvent, testDummyCallbackClass>(&testDummyCallbackClass::Callback, &obj);
 
-	dispatcher(testEvent);
+	dispatcher.Send(testEvent);
 	ASSERT_FALSE(testEvent.m_DummyData);
 }

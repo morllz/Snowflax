@@ -1,131 +1,49 @@
 #pragma once
 
+#include <queue>
 #include "EventHandler.h"
 #include "IEventListener.h"
 
 namespace Snowflax {
 
-	class EventDispatcher : public IEventListener {
+	class EventDispatcher {
 	public:
 		EventDispatcher() = default;
-		~EventDispatcher() override = default;
 
-		void OnEvent(Event& _event) override
+		void Send(Event& _event)
 		{
-			Dispatch(_event);
-		}
-
-		void Dispatch(Event& _event)
-		{
-			for (auto it = m_RegisteredHandlers.begin(); it < m_RegisteredHandlers.end(); ++it) 
+			for (auto& subscribedHandler : m_SubscribedHandlers)
 			{
-				if (const auto handler = *it; handler->GetEventType() == _event.GetEventType()) handler->Handle(_event);
+				if(subscribedHandler->GetEventType() == _event.GetEventType())subscribedHandler->Handle(_event);
 			}
 		}
-
-		void operator() (Event& _event)
+		void SendAll()
 		{
-			Dispatch(_event);
-		}
-
-		// TODO: refactor following abomination to use less repetitive code
-		template<EventClass E>
-		void Subscribe(void(* _func)(E&))
-		{
-			auto pos = std::ranges::find_if(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(),
-				[&](const std::shared_ptr<IEventHandler>& _handler)
-				{
-					if (_handler->GetEventType() != E::GetStaticType())
-						return false;
-
-					EventHandler<E>* handler = static_cast<EventHandler<E>*>(_handler.get());
-					return !handler->IsCallbackMember()
-						&& handler->GetCallback().template target<void(E&)>() == _func;
-				}
-			);
-
-			if (pos == m_RegisteredHandlers.end()) {
-				Register(std::make_shared<EventHandler<E>>(_func));
-			}
-		}
-		template<EventClass E, class C>
-		void Subscribe(void(C::* _func)(E&), C* _targetObj)
-		{
-			auto pos = std::ranges::find_if(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(),
-				[&](const std::shared_ptr<IEventHandler>& _handler)
-				{
-					if (_handler->GetEventType() != E::GetStaticType())
-						return false;
-
-					EventHandler<E>* handler = static_cast<EventHandler<E>*>(_handler.get());
-					return handler->IsCallbackMember()
-						&& *handler->GetCallback().template target<void(C::*)(E&)>() == _func
-						&& handler->GetTargetObject() == static_cast<void*>(_targetObj);
-				}
-			);
-
-			if (pos == m_RegisteredHandlers.end()) {
-				Register(std::make_shared<EventHandler<E>>(_func, _targetObj));
+			while (!m_EventQueue.empty()) 
+			{
+				Send(m_EventQueue.front());
+				m_EventQueue.pop();
 			}
 		}
 		template<EventClass E>
-		void Unsubscribe(void(*_func)(E&))
+		void Subscribe(std::function<void(E&)> _func)
 		{
-			auto pos = std::ranges::find_if(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(),
-				[&](const std::shared_ptr<IEventHandler>& _handler)
-				{
-					if (_handler->GetEventType() != E::GetStaticType())
-						return false;
-
-					EventHandler<E>* handler = static_cast<EventHandler<E>*>(_handler.get());
-					return !handler->IsCallbackMember()
-						&& handler->GetCallback().template target<void(E&)>() == _func;
-				}
-			);
-
-			if (pos != m_RegisteredHandlers.end()) {
-				Unregister(*pos);
-			}
+			m_SubscribedHandlers.insert(std::make_shared<EventHandler<E>>(_func));
 		}
-		template<EventClass E, class C>
-		void Unsubscribe(void(C::* _func)(E&), C* _targetObj)
+		template<EventClass E, typename C>
+		void Subscribe(std::function<void(const C&, E&)> _func, C* _targetObj)
 		{
-			auto pos = std::ranges::find_if(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(),
-				[&](const std::shared_ptr<IEventHandler>& _handler)
-				{
-					if (_handler->GetEventType() != E::GetStaticType())
-						return false;
-
-					EventHandler<E>* handler = static_cast<EventHandler<E>*>(_handler.get());
-					return handler->IsCallbackMember()
-						&& *handler->GetCallback().template target<void(C::*)(E&)>() == _func
-						&& handler->GetTargetObject() == static_cast<void*>(_targetObj);
-				}
-			);
-
-			if (pos != m_RegisteredHandlers.end()) {
-				Unregister(*pos);
-			}
+			Subscribe(std::bind_front(_func, _targetObj));
+		}
+		void Push(Event& _event)
+		{
+			m_EventQueue.push(std::ref(_event));
 		}
 		
-
 	private:
-		void Register(const std::shared_ptr<IEventHandler>& _handler)
-		{
-			if (std::ranges::find(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(), _handler) == m_RegisteredHandlers.end()) {
-				m_RegisteredHandlers.push_back(_handler);
-			}
-		}
 
-		void Unregister(const std::shared_ptr<IEventHandler>& _handler)
-		{
-			auto pos = std::ranges::find(m_RegisteredHandlers.begin(), m_RegisteredHandlers.end(), _handler);
-			if (pos != m_RegisteredHandlers.end()) {
-				m_RegisteredHandlers.erase(pos);
-			}
-		}
-
-		std::vector<std::shared_ptr<IEventHandler>> m_RegisteredHandlers;
+		std::unordered_set<std::shared_ptr<IEventHandler>> m_SubscribedHandlers;
+		std::queue<std::reference_wrapper<Event>> m_EventQueue;
 	};
 
 }

@@ -49,10 +49,9 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 		virtual EventType GetEventType() const = 0;
 		virtual int GetEventCategories() const = 0;
 
-		inline bool InCategory(EventCategory _category) const { return GetEventCategories() & static_cast<int>(_category); }
+		bool InCategory(EventCategory _category) const { return GetEventCategories() & static_cast<int>(_category); }
 	};
 
-	// Maybe remove this later if it creates more problems than it solves
 	template<class T>
 	concept EventClass = std::is_convertible_v<T*, Event*>;
 	
