@@ -53,13 +53,13 @@ TEST(EventSystemTests, SimpleEventDispatching) {
 	dispatcher.Send(testEvent);
 	ASSERT_FALSE(testEvent.m_DummyData);
 }
-TEST(EventSystemTests, InObjectEventDispatching)
+TEST(EventSystemTests, ToMemberFuncEventDispatching)
 {
 	auto testEvent = SimpleDummyTestEvent();
 	auto dispatcher = EventDispatcher();
 	auto obj = testDummyCallbackClass();
 
-	dispatcher.Subscribe<SimpleDummyTestEvent, testDummyCallbackClass>(&testDummyCallbackClass::Callback, &obj);
+	dispatcher.Subscribe<SimpleDummyTestEvent>(&testDummyCallbackClass::Callback, &obj);
 
 	dispatcher.Send(testEvent);
 	ASSERT_FALSE(testEvent.m_DummyData);

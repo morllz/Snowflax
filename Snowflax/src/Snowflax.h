@@ -7,4 +7,4 @@
 #include "Snowflax/Events/Event.h"
 #include "Snowflax/Events/EventDispatcher.h"
 #include "Snowflax/Debug/Log.h"
-#include "Snowflax/Utils.h"
+#include "Snowflax/Utils/Util.h"

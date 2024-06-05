@@ -5,10 +5,12 @@
 
 namespace Snowflax {
 
-	class Layer : public EventDispatcher {
+	class Layer : public IEventListener, EventDispatcher {
 	public:
 		Layer() = default;
-		~Layer() override = default;
+		virtual ~Layer() = default;
+
+		virtual void OnEvent(Event& _e) override { Send(_e); }
 
 		virtual void OnAttach() const = 0;
 		virtual void OnDetach() const = 0;

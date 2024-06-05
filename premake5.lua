@@ -17,10 +17,6 @@ workspace "Snowflax"
 
 	startproject "Sandbox"
 
-	defines {
-		"_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS"
-	}
-
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 

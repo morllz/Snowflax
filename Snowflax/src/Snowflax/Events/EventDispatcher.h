@@ -14,7 +14,7 @@ namespace Snowflax {
 		{
 			for (auto& subscribedHandler : m_SubscribedHandlers)
 			{
-				if(subscribedHandler->GetEventType() == _event.GetEventType())subscribedHandler->Handle(_event);
+				subscribedHandler->Handle(_event);
 			}
 		}
 		void SendAll()
@@ -25,15 +25,10 @@ namespace Snowflax {
 				m_EventQueue.pop();
 			}
 		}
-		template<EventClass E>
-		void Subscribe(std::function<void(E&)> _func)
+		template<EventClass TEvent, typename... Args>
+		void Subscribe(Args... _callbackArgs)
 		{
-			m_SubscribedHandlers.insert(std::make_shared<EventHandler<E>>(_func));
-		}
-		template<EventClass E, typename C>
-		void Subscribe(std::function<void(const C&, E&)> _func, C* _targetObj)
-		{
-			Subscribe(std::bind_front(_func, _targetObj));
+			m_SubscribedHandlers.insert(std::make_unique<EventHandler<TEvent>>(_callbackArgs...));
 		}
 		void Push(Event& _event)
 		{
@@ -42,7 +37,7 @@ namespace Snowflax {
 		
 	private:
 
-		std::unordered_set<std::shared_ptr<IEventHandler>> m_SubscribedHandlers;
+		std::unordered_set<std::unique_ptr<EventHandlerBase>> m_SubscribedHandlers;
 		std::queue<std::reference_wrapper<Event>> m_EventQueue;
 	};
 

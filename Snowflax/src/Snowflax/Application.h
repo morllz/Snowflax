@@ -7,10 +7,10 @@
 
 namespace Snowflax {
 
-	class Application : public EventDispatcher {
+	class Application : public EventDispatcher, IEventListener {
 	public:
 		Application();
-		~Application() override = default;
+		virtual ~Application() = default;
 
 		virtual void Run();
 		virtual void Shutdown();
