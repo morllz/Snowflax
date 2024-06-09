@@ -1,9 +1,9 @@
 #pragma once
 
+// SFX_ENABLE_LOGGING
+#ifdef SFX_ENABLE_LOGGING
+
 #include "SFXpch.h"
-
-
-#ifndef SFX_DIST
 
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -19,11 +19,12 @@
 #define SFX_GET_LOGGER Snowflax::Log::GetClientConsole()
 #endif // !SFX_CORE
 
-#define SFX_LOG_INFO(...)		SFX_GET_LOGGER->info(__VA_ARGS__)
-#define SFX_LOG_DEBUG(...)		SFX_GET_LOGGER->debug(__VA_ARGS__)
-#define SFX_LOG_WARN(...)		SFX_GET_LOGGER->warn(__VA_ARGS__)
-#define SFX_LOG_ERROR(...)		SFX_GET_LOGGER->error(__VA_ARGS__)
-#define SFX_LOG_CRITICAL(...)	SFX_GET_LOGGER->critical(__VA_ARGS__)
+
+#define SFX_LOG_INFO(...) SFX_GET_LOGGER()->info(...)
+#define SFX_LOG_DEBUG(...) SFX_GET_LOGGER()->debug(...)
+#define SFX_LOG_WARN(...) SFX_GET_LOGGER()->warn(...)
+#define SFX_LOG_ERROR(...)	SFX_GET_LOGGER()->error(...)
+#define SFX_LOG_CRITICAL(...) SFX_GET_LOGGER()->critical(...)
 
 
 namespace Snowflax {
@@ -50,4 +51,5 @@ namespace Snowflax {
 #define SFX_LOG_ERROR(...)	
 #define SFX_LOG_CRITICAL(...)
 
-#endif // SFX_DIST
+#endif
+// !SFX_ENABLE_LOGGING

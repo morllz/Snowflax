@@ -2,7 +2,7 @@
 
 #include "SFXpch.h"
 #include "Event.h"
-#include "Snowflax/Utils/Function.h"
+#include "Snowflax/Core/Function.h"
 
 namespace Snowflax {
 

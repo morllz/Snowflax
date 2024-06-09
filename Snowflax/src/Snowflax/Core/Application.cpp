@@ -4,7 +4,7 @@
 
 Snowflax::Application::Application()
 {
-	Subscribe<WindowClosedEvent>(&Application::WindowClosed, this);
+	Subscribe<WindowClosedEvent>(&Application::OnWindowClosed, this);
 }
 
 void Snowflax::Application::Run ()
@@ -27,7 +27,7 @@ void Snowflax::Application::OnEvent(Event& _event) {
 	m_LayerStack.OnEvent(_event);
 }
 
-void Snowflax::Application::WindowClosed(WindowClosedEvent& _event)
+void Snowflax::Application::OnWindowClosed(WindowClosedEvent& _event)
 {
 	m_IsRunning = false;
 }

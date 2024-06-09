@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Snowflax/Utils/Util.h"
-
 
 namespace Snowflax {
 
@@ -14,7 +12,6 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 // ---------------------- event definition macro -------------------------------------------------------------------
 #define EVENT_CLASS_TYPE(type)	static EventType GetStaticType() { return EventType::##type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }
-#define EVENT_CLASS_CATEGORY(category, ...)	virtual int GetEventCategories() const override { return (int)EventCategory::category; }\
 
 #define EVENT_CLASS_CALC_DERIVED(X, N, ...) N
 
@@ -25,7 +22,6 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 		~__##name##_Type_Class() = default;\
 	public:\
 		EVENT_CLASS_TYPE(type)\
-		EVENT_CLASS_CATEGORY(##__VA_ARGS__##)\
 	};\
 	class name : public __##name##_Type_Class
 // -----------------------------------------------------------------------------------------------------------------
@@ -36,20 +32,17 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 		WindowClosedEvent
 	};
 
-	enum class EventCategory {
-		None = BIT(0),
-		WindowEvents = BIT(1),
-	};
-
 	class Event {
 	public:
 		Event() = default;
 		virtual ~Event() = default;
 
 		virtual EventType GetEventType() const = 0;
-		virtual int GetEventCategories() const = 0;
 
-		bool InCategory(EventCategory _category) const { return GetEventCategories() & static_cast<int>(_category); }
+		operator bool() const { return m_Handled; }
+		virtual void SetHandled() { m_Handled = true; }
+	private:
+		bool m_Handled = false;
 	};
 
 	template<class T>

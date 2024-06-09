@@ -2,7 +2,7 @@
 
 #include <queue>
 #include "EventHandler.h"
-#include "IEventListener.h"
+#include "EventListener.h"
 
 namespace Snowflax {
 

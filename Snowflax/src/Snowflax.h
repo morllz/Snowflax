@@ -2,9 +2,8 @@
 
 // Used by Snowflax applications
 
-#include "Snowflax/EntryPoint.h"
-#include "Snowflax/Application.h"
+#include "Snowflax/Core/EntryPoint.h"
+#include "Snowflax/Core/Application.h"
 #include "Snowflax/Events/Event.h"
 #include "Snowflax/Events/EventDispatcher.h"
-#include "Snowflax/Debug/Log.h"
-#include "Snowflax/Utils/Util.h"
+#include "Snowflax/Core/Log.h"

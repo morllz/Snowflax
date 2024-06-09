@@ -6,7 +6,7 @@
 
 namespace Snowflax {
 
-	class LayerStack : IEventListener {
+	class LayerStack : EventListener {
 		using LStack = std::vector<Layer*>;
 		using LIterator = LStack::iterator;
 	public:
