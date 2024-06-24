@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Snowflax/Core/Base.h"
+
 
 namespace Snowflax {
 
@@ -15,21 +17,21 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 
 #define EVENT_CLASS_CALC_DERIVED(X, N, ...) N
 
-#define EVENT(name, type, ...) \
-	class __##name##_Type_Class : public EVENT_CLASS_CALC_DERIVED(##__VA_ARGS__##, Event) { \
+#define EVENT(name, ...) \
+	class __##name##_TypeBase : public EVENT_CLASS_CALC_DERIVED(__VA_ARGS__, Event) { \
 	protected:\
-		__##name##_Type_Class() = default;\
-		~__##name##_Type_Class() = default;\
+		__##name##_TypeBase() = default;\
+		virtual ~__##name##_TypeBase() = default;\
 	public:\
-		EVENT_CLASS_TYPE(type)\
+		EVENT_CLASS_TYPE(SFLX_MACRO_GET_FIRST_ARG(__VA_ARGS__))\
 	};\
-	class name : public __##name##_Type_Class
+	class name : public __##name##_TypeBase
 // -----------------------------------------------------------------------------------------------------------------
 
 	enum class EventType {
 		None = 0,
 		DummyEvent,
-		WindowClosedEvent
+		WindowShouldCloseEvent
 	};
 
 	class Event {
@@ -39,9 +41,13 @@ To future me: DON'T DELETE THIS AGAIN AS YOU PROBABLY WON'T BE ABLE TO WRITE IT 
 
 		virtual EventType GetEventType() const = 0;
 
-		operator bool() const { return m_Handled; }
-		virtual void SetHandled() { m_Handled = true; }
+		virtual operator bool() const { return m_Handled; }
+		virtual bool& Handled() { return m_Handled; }
+
+		virtual const char* GetName() const { return m_Name;}
+		virtual std::string ToString() const  { return m_Name; }
 	private:
+		const char* m_Name = "Event";
 		bool m_Handled = false;
 	};
 

@@ -14,28 +14,34 @@ project "Snowflax"
 
 	includedirs {
 		"src",
-		"vendor/spdlog/include"
+		"vendor/spdlog/include",
+		"%{wks.location}/GLFW/include"
 	}
 
-	pchheader "SFXpch.h"
-	pchsource "src/SFXpch.cpp"
+	defines "SFLX_CORE"
+
+	pchheader "SFLXpch.h"
+	pchsource "src/SFLXpch.cpp"
+
+	links {
+		"GLFW"
+	}
 
 	filter "system:windows"
 		systemversion "latest"
 
-	defines {
-		"SFX_PLATFORM_WINDOWS",
-		"SFX_CORE"
-	}
+		defines {
+			"SFLX_PLATFORM_WINDOWS"
+		}
 
 	filter "configurations:Debug"
-		defines "SFX_DEBUG"
+		defines "SFLX_DEBUG"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "SFX_RELEASE"
+		defines "SFLX_RELEASE"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "SFX_DIST"
+		defines "SFLX_DIST"
 		optimize "on"

@@ -2,6 +2,10 @@
 
 #include "LayerStack.h"
 #include "Snowflax/Events/WindowEvents.h"
+#include "Window.h"
+#ifdef SFLX_PLATFORM_WINDOWS
+#include "Snowflax/Platform/Windows/WindowsWindow.h"
+#endif
 
 
 namespace Snowflax {
@@ -16,9 +20,10 @@ namespace Snowflax {
 		void OnEvent(Event& _event) override;
 		virtual bool IsRunning() { return m_IsRunning; }
 
-		virtual void OnWindowClosed(WindowClosedEvent& _event);
+		virtual bool OnWindowShouldClose(WindowShouldCloseEvent& _event);
 	
 	private:
+		Scope<Window> m_Window;
 		LayerStack m_LayerStack;
 
 		bool m_IsRunning = false;

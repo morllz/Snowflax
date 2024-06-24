@@ -22,3 +22,5 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 include "Snowflax"
 include "Sandbox"
 include "SnowflaxTest"
+
+include "GLFW"

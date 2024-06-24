@@ -1,10 +1,12 @@
-#include "SFXpch.h"
+#include "SFLXpch.h"
 #include "Application.h"
 
 
 Snowflax::Application::Application()
 {
-	Subscribe<WindowClosedEvent>(&Application::OnWindowClosed, this);
+	Subscribe<WindowShouldCloseEvent>(&Application::OnWindowShouldClose, this);
+	m_Window = Window::Create();
+	m_Window->SetEventListener(this);
 }
 
 void Snowflax::Application::Run ()
@@ -13,6 +15,7 @@ void Snowflax::Application::Run ()
 
 	while (m_IsRunning)
 	{
+		m_Window->Update();
 		m_LayerStack.Update();
 	}
 
@@ -27,7 +30,8 @@ void Snowflax::Application::OnEvent(Event& _event) {
 	m_LayerStack.OnEvent(_event);
 }
 
-void Snowflax::Application::OnWindowClosed(WindowClosedEvent& _event)
+bool Snowflax::Application::OnWindowShouldClose(WindowShouldCloseEvent& _event)
 {
 	m_IsRunning = false;
+	return true;
 }

@@ -6,5 +6,5 @@
 namespace Snowflax
 {
 
-	EVENT(WindowClosedEvent, WindowClosedEvent, WindowEvents) {};
+	EVENT(WindowShouldCloseEvent, WindowShouldCloseEvent) {};
 }

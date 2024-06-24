@@ -5,7 +5,7 @@ namespace  SnowflaxTest
 {
 	class Application final : public Snowflax::Application {
 	public:
-		Application(const int _argc, char** _argv) : m_Argc(_argc), m_Argv(_argv) {}
+		Application(int _argc, char** _argv) : m_Argc(_argc), m_Argv(_argv) {}
 		Application() = default;
 
 		void Run() override {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SFXpch.h"
+#include "SFLXpch.h"
 #include "Event.h"
 #include "Snowflax/Core/Function.h"
 
@@ -19,17 +19,19 @@ namespace Snowflax {
 	class EventHandler : public EventHandlerBase {
 	public:
 		template<typename... Args>
-		EventHandler(Args... _callbackArgs) : m_Callback(_callbackArgs...){ }
+		EventHandler(Args... _callbackArgs)
+		requires requires (Args... _args) { Function<bool, TEvent&>(_args...); }
+			: m_Callback(Function<bool, TEvent&>(_callbackArgs...)) {}
 
 		void Handle(Event& _e) override
 		{
-			if(_e.GetEventType() == GetEventType()) m_Callback(dynamic_cast<TEvent&>(_e));
+			if(_e.GetEventType() == GetEventType()) _e.Handled() |= m_Callback(static_cast<TEvent&>(_e));
 		}
 		EventType GetEventType() override
 		{
 			return TEvent::GetStaticType();
 		}
 	private:
-		Function<void, TEvent&> m_Callback;
+		Function<bool, TEvent&> m_Callback;
 	};
 }

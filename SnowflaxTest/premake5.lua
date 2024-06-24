@@ -17,6 +17,7 @@ project "SnowflaxTest"
 
 	includedirs {
 		"%{wks.location}/Snowflax/src",
+		"%{wks.location}/Snowflax/vendor/spdlog/include",
 		"vendor/googletest/googletest/include",
 		"vendor/googletest/googletest/"
 	}

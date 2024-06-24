@@ -1,30 +1,32 @@
 #pragma once
 
-// SFX_ENABLE_LOGGING
-#ifdef SFX_ENABLE_LOGGING
+#include "Base.h"
 
-#include "SFXpch.h"
+// SFLX_ENABLE_LOGGING
+#ifdef SFLX_ENABLE_LOGGING
+
+#include "SFLXpch.h"
 
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 // ------------- LOGGING PATTERN --------------------------
-#define SFX_CORE_LOG_PATTERN "%T.%e [%n] %^%v%$"
+#define SFLX_CORE_LOG_PATTERN "%T.%e [%n] %^%v%$"
 // --------------------------------------------------------
 
 
-#ifdef SFX_CORE
-#define SFX_GET_LOGGER Snowflax::Log::GetCoreConsole()
-#endif // SFX_CORE
-#ifndef SFX_CORE
-#define SFX_GET_LOGGER Snowflax::Log::GetClientConsole()
-#endif // !SFX_CORE
+#ifdef SFLX_CORE
+#define SFLX_GET_LOGGER() Snowflax::Log::GetCoreConsole()
+#endif // SFLX_CORE
+#ifndef SFLX_CORE
+#define SFLX_GET_LOGGER() Snowflax::Log::GetClientConsole()
+#endif // !SFLX_CORE
 
 
-#define SFX_LOG_INFO(...) SFX_GET_LOGGER()->info(...)
-#define SFX_LOG_DEBUG(...) SFX_GET_LOGGER()->debug(...)
-#define SFX_LOG_WARN(...) SFX_GET_LOGGER()->warn(...)
-#define SFX_LOG_ERROR(...)	SFX_GET_LOGGER()->error(...)
-#define SFX_LOG_CRITICAL(...) SFX_GET_LOGGER()->critical(...)
+#define SFLX_LOG_INFO(...)		{ SFLX_GET_LOGGER()->info(__VA_ARGS__); 	}
+#define SFLX_LOG_DEBUG(...)		{ SFLX_GET_LOGGER()->debug(__VA_ARGS__);	}
+#define SFLX_LOG_WARN(...)		{ SFLX_GET_LOGGER()->warn(__VA_ARGS__);		}
+#define SFLX_LOG_ERROR(...)		{ SFLX_GET_LOGGER()->error(__VA_ARGS__);	}
+#define SFLX_LOG_CRITICAL(...)	{ SFLX_GET_LOGGER()->critical(__VA_ARGS__);	}
 
 
 namespace Snowflax {
@@ -45,11 +47,11 @@ namespace Snowflax {
 
 #else
 
-#define SFX_LOG_INFO(...)	
-#define SFX_LOG_DEBUG(...)	
-#define SFX_LOG_WARN(...)	
-#define SFX_LOG_ERROR(...)	
-#define SFX_LOG_CRITICAL(...)
+#define SFLX_LOG_INFO(...)	
+#define SFLX_LOG_DEBUG(...)	
+#define SFLX_LOG_WARN(...)	
+#define SFLX_LOG_ERROR(...)	
+#define SFLX_LOG_CRITICAL(...)
 
 #endif
-// !SFX_ENABLE_LOGGING
+// !SFLX_ENABLE_LOGGING

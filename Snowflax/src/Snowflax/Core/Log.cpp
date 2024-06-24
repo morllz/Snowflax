@@ -1,12 +1,12 @@
-#include "SFXpch.h"
+#include "SFLXpch.h"
 #include "Log.h"
 
-#ifdef SFX_ENABLE_LOGGING
+#ifdef SFLX_ENABLE_LOGGING
 
 void Snowflax::Log::Init()
 {
 	auto coreSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	coreSink->set_pattern(SFX_CORE_LOG_PATTERN);
+	coreSink->set_pattern(SFLX_CORE_LOG_PATTERN);
 	coreSink->set_level(spdlog::level::trace);
 	coreSink->set_color(spdlog::level::trace, 8);
 	coreSink->set_color(spdlog::level::info, 10);
@@ -19,7 +19,7 @@ void Snowflax::Log::Init()
 	m_sCoreLogger->set_level(spdlog::level::trace);
 
 	auto clientSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	clientSink->set_pattern(SFX_CORE_LOG_PATTERN);
+	clientSink->set_pattern(SFLX_CORE_LOG_PATTERN);
 	clientSink->set_level(spdlog::level::trace);
 	clientSink->set_color(spdlog::level::trace, 8);
 	clientSink->set_color(spdlog::level::info, 10);
@@ -44,4 +44,4 @@ std::shared_ptr<spdlog::logger>& Snowflax::Log::GetClientConsole()
 	return m_sClientLogger;
 }
 
-#endif // SFX_DIST
+#endif // SFLX_DIST
