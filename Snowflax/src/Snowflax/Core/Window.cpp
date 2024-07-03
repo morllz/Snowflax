@@ -18,6 +18,4 @@ namespace Snowflax
 #endif
 		>(_windowSpecs);
 	}
-
-
 }

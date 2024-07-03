@@ -6,22 +6,21 @@
 
 namespace Snowflax {
 
-	class LayerStack : EventListener {
+	class LayerStack : public EventListener {
 		using LStack = std::vector<Layer*>;
-		using LIterator = LStack::iterator;
 	public:
-		LayerStack();
-		~LayerStack() override;
+		LayerStack() = default;
+		virtual ~LayerStack() override;
 
 		void OnEvent(Event& _event) override;
-		void Update();
-		void PushLayer(Layer* _pLayer);
-		void PopLayer(Layer* _pLayer);
-		void PushOverlay(Layer* _pLayer);
-		void PopOverlay(Layer* _pLayer);
+		void Update() const;
+		void PushLayer(Layer* _layer);
+		void PopLayer(Layer const* _layer);
+		void PushOverlay(Layer* _overlay);
+		void PopOverlay(Layer const* _overlay);
 
 	private:
 		LStack m_Layers;
-		LIterator m_FirstLayerPos;
+		int m_LayerInsertIndex = 0;
 	};
 }

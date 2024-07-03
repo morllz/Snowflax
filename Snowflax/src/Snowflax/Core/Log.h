@@ -7,7 +7,9 @@
 
 #include "SFLXpch.h"
 
+#pragma warning(push, 0)
 #include "spdlog/sinks/stdout_color_sinks.h"
+#pragma warning(pop)
 
 // ------------- LOGGING PATTERN --------------------------
 #define SFLX_CORE_LOG_PATTERN "%T.%e [%n] %^%v%$"
@@ -22,11 +24,11 @@
 #endif // !SFLX_CORE
 
 
-#define SFLX_LOG_INFO(...)		{ SFLX_GET_LOGGER()->info(__VA_ARGS__); 	}
-#define SFLX_LOG_DEBUG(...)		{ SFLX_GET_LOGGER()->debug(__VA_ARGS__);	}
-#define SFLX_LOG_WARN(...)		{ SFLX_GET_LOGGER()->warn(__VA_ARGS__);		}
-#define SFLX_LOG_ERROR(...)		{ SFLX_GET_LOGGER()->error(__VA_ARGS__);	}
-#define SFLX_LOG_CRITICAL(...)	{ SFLX_GET_LOGGER()->critical(__VA_ARGS__);	}
+#define SFLX_LOG_INFO(...)		SFLX_GET_LOGGER()->info(__VA_ARGS__)
+#define SFLX_LOG_DEBUG(...)		SFLX_GET_LOGGER()->debug(__VA_ARGS__)
+#define SFLX_LOG_WARN(...)		SFLX_GET_LOGGER()->warn(__VA_ARGS__)
+#define SFLX_LOG_ERROR(...)		SFLX_GET_LOGGER()->error(__VA_ARGS__)
+#define SFLX_LOG_CRITICAL(...)	SFLX_GET_LOGGER()->critical(__VA_ARGS__)
 
 
 namespace Snowflax {

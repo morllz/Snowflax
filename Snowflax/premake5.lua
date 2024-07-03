@@ -15,7 +15,7 @@ project "Snowflax"
 	includedirs {
 		"src",
 		"vendor/spdlog/include",
-		"%{wks.location}/GLFW/include"
+		"vendor/GLFW/include"
 	}
 
 	defines "SFLX_CORE"

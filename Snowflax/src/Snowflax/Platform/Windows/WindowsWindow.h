@@ -32,11 +32,11 @@ namespace Snowflax
 	private:
 		struct WindowData
 		{
-			std::string Title;
-			uint32_t Width;
-			uint32_t Height;
+			std::string Title = "Snowflax";
+			uint32_t Width = 1600;
+			uint32_t Height = 900;
 
-			EventListener* EventListener;
+			EventListener* EventListener = nullptr;
 		};
 
 		void SendEvent(Event& _event) const;

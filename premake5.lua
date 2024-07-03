@@ -19,8 +19,9 @@ workspace "Snowflax"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-include "Snowflax"
-include "Sandbox"
-include "SnowflaxTest"
+group "Snowflax"
+	include "Snowflax"
+	include "Sandbox"
 
-include "GLFW"
+group "Dependencies"
+	include "Snowflax/vendor/GLFW"

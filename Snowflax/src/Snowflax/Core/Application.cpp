@@ -2,36 +2,40 @@
 #include "Application.h"
 
 
-Snowflax::Application::Application()
+namespace Snowflax
 {
-	Subscribe<WindowShouldCloseEvent>(&Application::OnWindowShouldClose, this);
-	m_Window = Window::Create();
-	m_Window->SetEventListener(this);
-}
 
-void Snowflax::Application::Run ()
-{
-	m_IsRunning = true;
-
-	while (m_IsRunning)
+	Application::Application()
+		: EventDispatcher(SFLX_BIND_EVENT_FUNC(Application::OnWindowClose))
 	{
-		m_Window->Update();
-		m_LayerStack.Update();
+		m_Window = Window::Create();
+		m_Window->SetEventListener(this);
 	}
 
+	void Application::Run ()
+	{
+		m_IsRunning = true;
+	
+		while (m_IsRunning)
+		{
+			m_Window->Update();
+			m_LayerStack.Update();
+		}
+	}
+
+	void Application::Shutdown() {
+	
+	}
+
+	void Application::OnEvent(Event& _event) {
+		Send(_event);
+		m_LayerStack.OnEvent(_event);
+	}
+
+	bool Application::OnWindowClose(WindowCloseEvent& _event)
+	{
+		m_IsRunning = false;
+		return true;
+	}
 }
 
-void Snowflax::Application::Shutdown() {
-
-}
-
-void Snowflax::Application::OnEvent(Event& _event) {
-	Send(_event);
-	m_LayerStack.OnEvent(_event);
-}
-
-bool Snowflax::Application::OnWindowShouldClose(WindowShouldCloseEvent& _event)
-{
-	m_IsRunning = false;
-	return true;
-}

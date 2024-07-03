@@ -1,6 +1,9 @@
 #include "SFLXpch.h"
 #include "WindowsWindow.h"
 
+#include "Snowflax/Events/KeyEvents.h"
+#include "Snowflax/Events/MouseEvents.h"
+
 
 namespace Snowflax
 {
@@ -20,11 +23,11 @@ namespace Snowflax
 
 		glfwSetErrorCallback([](int _errorCode, const char* _description)
 		{
-			SFLX_LOG_ERROR("GLFW error {0} occured! {1}", _errorCode, _description)
+			SFLX_LOG_ERROR("GLFW error {0} occured! {1}", _errorCode, _description);
 		});
 
 		if(GLFWWindowCount == 0)
-			SFLX_ASSERT(glfwInit())
+			SFLX_ASSERT(glfwInit());
 
 		m_Window = glfwCreateWindow(
 			static_cast<int>(_windowSpecs.Width), 
@@ -33,7 +36,7 @@ namespace Snowflax
 			nullptr, 
 			nullptr
 		);
-		SFLX_ASSERT(m_Window)
+		SFLX_ASSERT(m_Window);
 		GLFWWindowCount++;
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -41,7 +44,100 @@ namespace Snowflax
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* _window)
 		{
 			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
-			WindowShouldCloseEvent event;
+			WindowCloseEvent event;
+			data->EventListener->OnEvent(event);
+		});
+
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* _window, int _width, int _height)
+		{
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			WindowResizeEvent event(_width, _height);
+			data->EventListener->OnEvent(event);
+		});
+
+		glfwSetWindowPosCallback(m_Window, [](GLFWwindow* _window, int _xPos, int _yPos)
+		{
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			WindowMovedEvent event(_xPos, _yPos);
+			data->EventListener->OnEvent(event);
+		});
+		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* _window, int _focus)
+		{
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			if(_focus)
+			{
+				WindowFocusEvent event;
+				data->EventListener->OnEvent(event);
+			}
+			else
+			{
+				WindowLostFocusEvent event;
+				data->EventListener->OnEvent(event);
+			}
+		});
+
+		glfwSetWindowMaximizeCallback(m_Window, [](GLFWwindow* _window, int _maximized)
+		{
+			if(!_maximized) return;
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			WindowMaximizedEvent event;
+			data->EventListener->OnEvent(event);
+		});
+
+		glfwSetWindowIconifyCallback(m_Window, [](GLFWwindow* _window, int _iconified)
+		{
+			if(!_iconified) return;
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			WindowMinimizedEvent event;
+			data->EventListener->OnEvent(event);
+		});
+
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* _window, int _keyCode, int _scanCode, int _action, int _modFlags)
+		{
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			switch (_action)
+			{
+			case GLFW_PRESS:
+				{
+					KeyPressedEvent event(static_cast<Key::KeyCode>(_keyCode), _modFlags, 0);
+					data->EventListener->OnEvent(event);
+					break;
+				}
+			case GLFW_RELEASE:
+				{
+					KeyReleasedEvent event(static_cast<Key::KeyCode>(_keyCode), _modFlags);
+					data->EventListener->OnEvent(event);
+					break;
+				}
+			case GLFW_REPEAT:
+				{
+					KeyPressedEvent event(static_cast<Key::KeyCode>(_keyCode), _modFlags, 1);
+					data->EventListener->OnEvent(event);
+					break;
+				}
+			default:
+				break;
+			}
+		});
+
+		glfwSetCharCallback(m_Window, [](GLFWwindow* _window, unsigned int _keyCode)
+		{
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			KeyTypedEvent event(static_cast<Key::KeyCode>(_keyCode));
+			data->EventListener->OnEvent(event);
+		});
+
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* _window, double _xOffset, double _yOffset)
+		{
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			MouseScrolledEvent event(static_cast<float>(_xOffset), static_cast<float>(_yOffset));
+			data->EventListener->OnEvent(event);
+		});
+
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* _window, double _xPos, double _yPos)
+		{
+			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
+			MouseMovedEvent event(static_cast<float>(_xPos), static_cast<float>(_yPos));
 			data->EventListener->OnEvent(event);
 		});
 	}

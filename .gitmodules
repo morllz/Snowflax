@@ -1,9 +1,6 @@
 [submodule "Snowflax/vendor/spdlog"]
 	path = Snowflax/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "SnowflaxTest/vendor/googletest"]
-	path = SnowflaxTest/vendor/googletest
-	url = https://github.com/google/googletest.git
-[submodule "GLFW"]
-	path = GLFW
+[submodule "Snowflax/vendor/GLFW"]
+	path = Snowflax/vendor/GLFW
 	url = https://github.com/PluginOfTimes/glfw

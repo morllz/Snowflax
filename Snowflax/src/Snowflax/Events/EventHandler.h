@@ -2,7 +2,6 @@
 
 #include "SFLXpch.h"
 #include "Event.h"
-#include "Snowflax/Core/Function.h"
 
 namespace Snowflax {
 
@@ -18,20 +17,18 @@ namespace Snowflax {
 	template<EventClass TEvent>
 	class EventHandler : public EventHandlerBase {
 	public:
-		template<typename... Args>
-		EventHandler(Args... _callbackArgs)
-		requires requires (Args... _args) { Function<bool, TEvent&>(_args...); }
-			: m_Callback(Function<bool, TEvent&>(_callbackArgs...)) {}
+		EventHandler(std::function<bool(TEvent&)> _func)
+			: m_Callback(std::forward<std::function<bool(TEvent&)>>(_func)) {}
 
 		void Handle(Event& _e) override
 		{
 			if(_e.GetEventType() == GetEventType()) _e.Handled() |= m_Callback(static_cast<TEvent&>(_e));
 		}
-		EventType GetEventType() override
+		constexpr EventType GetEventType() override
 		{
 			return TEvent::GetStaticType();
 		}
 	private:
-		Function<bool, TEvent&> m_Callback;
+		std::function<bool(TEvent&)> m_Callback;
 	};
 }

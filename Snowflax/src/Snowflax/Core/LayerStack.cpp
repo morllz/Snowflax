@@ -1,71 +1,69 @@
 #include "SFLXpch.h"
 #include "LayerStack.h"
+#include <ranges>
 
-
-using namespace Snowflax;
-
-Snowflax::LayerStack::LayerStack()
+namespace Snowflax
 {
-	m_FirstLayerPos = m_Layers.end();
-}
-
-LayerStack::~LayerStack()
-{
-	for (auto layer : m_Layers) {
-		layer->OnDetach();
+	LayerStack::~LayerStack()
+	{
+		for (Layer* layer : m_Layers)
+		{
+			layer->OnDetach();
+			delete layer;
+		}
 	}
-	m_Layers.clear();
-}
 
-void LayerStack::OnEvent(Event& _event)
-{
-	for (auto layer : m_Layers) {
-		layer->OnEvent(_event);
+	void LayerStack::OnEvent(Event& _event)
+	{
+		for (auto layer : m_Layers | std::views::reverse) {
+			if(_event)
+			{
+				layer->OnEvent(_event);
+				break;
+			}
+		}
 	}
-}
 
-void Snowflax::LayerStack::Update()
-{
-	for (auto layer : m_Layers) {
-		layer->OnUpdate();
+	void LayerStack::Update() const
+	{
+		for (auto layer : m_Layers) {
+			layer->OnUpdate();
+		}
 	}
-}
 
-void LayerStack::PushLayer(Layer* _pLayer)
-{
-	if (_pLayer->IsOverlay()) return;
-	if (const auto pos = std::find(m_FirstLayerPos, m_Layers.end(), _pLayer); 
-		pos != m_Layers.end()) return;
+	void LayerStack::PushLayer(Layer* _layer)
+	{
+		_layer->SetOverlay(false);
+		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, _layer);
+		m_LayerInsertIndex++;
+	}
 
-	m_FirstLayerPos = m_Layers.insert(m_FirstLayerPos, _pLayer);
-	_pLayer->OnAttach();
-}
+	void LayerStack::PushOverlay(Layer* _overlay)
+	{
+		_overlay->SetOverlay(true);
+		m_Layers.emplace_back(_overlay);
+	}
 
-void LayerStack::PopLayer(Layer* _pLayer)
-{
-	if (_pLayer->IsOverlay()) return;
-	if (const auto pos = std::find(m_FirstLayerPos, m_Layers.end(), _pLayer); 
-		pos != m_Layers.end()) m_Layers.erase(pos);
+	void LayerStack::PopLayer(Layer const* _layer)
+	{
+		if (auto pos = std::find(m_Layers.begin(), m_Layers.begin() + m_LayerInsertIndex, _layer);
+			pos != m_Layers.begin() + m_LayerInsertIndex)
+		{
+			_layer->OnDetach();
+			m_Layers.erase(pos);
+			m_LayerInsertIndex--;
+		}
+	}
 
-	m_FirstLayerPos = std::find_if(m_FirstLayerPos, m_Layers.end(), [](Layer const* layer) { return !layer->IsOverlay(); });
-	_pLayer->OnDetach();
-}
+	void LayerStack::PopOverlay(Layer const* _overlay)
+	{
+		if (auto pos = std::find(m_Layers.begin() + m_LayerInsertIndex, m_Layers.end(), _overlay);
+			pos != m_Layers.end())
+		{
+			_overlay->OnDetach();
+			m_Layers.erase(pos);
+		}
+	}
 
-void LayerStack::PushOverlay(Layer* _pLayer)
-{
-	if (!_pLayer->IsOverlay()) return;
-	if (const auto pos = std::find(m_Layers.begin(), m_FirstLayerPos, _pLayer);
-		pos != m_Layers.end()) return;
 
-	m_Layers.insert(m_Layers.begin(), _pLayer);
-	_pLayer->OnAttach();
-}
-
-void LayerStack::PopOverlay(Layer* _pLayer)
-{
-	if (!_pLayer->IsOverlay()) return;
-	if (const auto pos = std::find(m_Layers.begin(), m_FirstLayerPos, _pLayer);
-		pos != m_Layers.end()) m_Layers.erase(pos);
-
-	_pLayer->OnDetach();
 }

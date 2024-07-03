@@ -8,7 +8,6 @@
 #define SFLX_EXPAND_MACRO(x) x
 #define SFLX_STRINGIFY_MACRO(x) #x
 
-
 #ifdef SFLX_DEBUG
 	#if defined(SFLX_PLATFORM_WINDOWS)
 		#define SFLX_DEBUGBREAK() __debugbreak()
