@@ -9,7 +9,7 @@ public:
 
 	virtual void OnEvent(Snowflax::Event& _event) override
 	{
-		SFLX_LOG_INFO(_event.ToString());
+		SFLX_LOG_TRACE(_event.ToString());
 		Application::OnEvent(_event);
 	}
 };

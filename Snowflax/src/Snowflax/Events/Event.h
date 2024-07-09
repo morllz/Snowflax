@@ -24,32 +24,32 @@ namespace Snowflax {
 		MouseEvents = BIT(4)
 	};
 
-	class Event {
-	public:
-		Event() = default;
-		virtual ~Event() = default;
+    class Event {
+    public:
+        Event() = default;
+        virtual ~Event() = default;
 
-		virtual EventType GetEventType() const = 0;
-		virtual int GetCategoryTags() const = 0;
-		virtual bool InCategory(int _category)
-		{
-			return GetCategoryTags() & _category;
-		}
+        virtual EventType GetEventType() const = 0;
+        virtual int GetCategoryTags() const = 0;
+        virtual bool InCategory(int _category)
+        {
+            return GetCategoryTags() & _category;
+        }
 
-		virtual operator bool() const { return m_Handled; }
-		virtual bool& Handled() { return m_Handled; }
+        virtual operator bool() const { return m_Handled; }
+        virtual bool& Handled() { return m_Handled; }
 
-		virtual const char* GetName() const { return "Event"; }
-		virtual std::string ToString() const { return GetName(); }
-	private:
-		bool m_Handled = false;
-	};
+        virtual const char* GetName() const { return "Event"; }
+        virtual std::string ToString() const { return GetName(); }
+
+    private:
+        bool m_Handled = false;
+    };
 
 	inline std::ostream& operator<<(std::ostream& _os, const Event& _e)
 	{
 		return _os << _e.ToString();
 	}
-
 
 	template<class T>
 	concept EventClass = std::is_convertible_v<T*, Event*>;

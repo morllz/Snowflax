@@ -16,6 +16,8 @@
 	#endif
 	#define SFLX_ENABLE_ASSERTS
 	#define SFLX_ENABLE_LOGGING
+
+	#define SFLX_VULKAN_ENABLE_VALIDATION_LAYERS
 #else
 	#define SFLX_DEBUGBREAK()
 #endif

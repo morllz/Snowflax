@@ -5,6 +5,8 @@
 #include "GLFW/glfw3.h"
 #include "Snowflax/Core/Window.h"
 #include "Snowflax/Events/WindowEvents.h"
+#include "Snowflax/Graphics/GraphicsContext.h"
+
 
 namespace Snowflax
 {
@@ -43,6 +45,8 @@ namespace Snowflax
 
 		WindowData m_Data;
 		GLFWwindow* m_Window;
+
+		Scope<GraphicsContext> m_GraphicsContext;
 
 		bool m_VSync = false;
 

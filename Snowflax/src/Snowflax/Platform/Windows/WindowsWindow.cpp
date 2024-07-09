@@ -41,6 +41,9 @@ namespace Snowflax
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 
+		m_GraphicsContext = GraphicsContext::Create();
+		m_GraphicsContext->Init();
+
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* _window)
 		{
 			WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(_window));
@@ -144,6 +147,7 @@ namespace Snowflax
 
 	WindowsWindow::~WindowsWindow()
 	{
+		m_GraphicsContext->CleanUp();
 		glfwDestroyWindow(m_Window);
 		GLFWWindowCount--;
 

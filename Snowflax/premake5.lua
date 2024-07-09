@@ -15,7 +15,8 @@ project "Snowflax"
 	includedirs {
 		"src",
 		"vendor/spdlog/include",
-		"vendor/GLFW/include"
+		"vendor/GLFW/include",
+		os.getenv("VULKAN_SDK") .. "/Include"
 	}
 
 	defines "SFLX_CORE"
@@ -23,8 +24,13 @@ project "Snowflax"
 	pchheader "SFLXpch.h"
 	pchsource "src/SFLXpch.cpp"
 
+	libdirs {
+		os.getenv("VULKAN_SDK") .. "/Lib"
+	}
+
 	links {
-		"GLFW"
+		"GLFW",
+		"vulkan-1"
 	}
 
 	filter "system:windows"

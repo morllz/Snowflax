@@ -23,7 +23,7 @@
 #define SFLX_GET_LOGGER() Snowflax::Log::GetClientConsole()
 #endif // !SFLX_CORE
 
-
+#define SFLX_LOG_TRACE(...)		SFLX_GET_LOGGER()->trace(__VA_ARGS__)
 #define SFLX_LOG_INFO(...)		SFLX_GET_LOGGER()->info(__VA_ARGS__)
 #define SFLX_LOG_DEBUG(...)		SFLX_GET_LOGGER()->debug(__VA_ARGS__)
 #define SFLX_LOG_WARN(...)		SFLX_GET_LOGGER()->warn(__VA_ARGS__)
@@ -49,6 +49,7 @@ namespace Snowflax {
 
 #else
 
+#define SFLX_LOG_TRACE(...)
 #define SFLX_LOG_INFO(...)	
 #define SFLX_LOG_DEBUG(...)	
 #define SFLX_LOG_WARN(...)	
