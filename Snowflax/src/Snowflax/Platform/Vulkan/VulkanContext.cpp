@@ -13,6 +13,7 @@ namespace Snowflax
 		SetupDebugMessenger();
 #endif
 
+		PickPhysicalDevice();
 	}
 
 	void VulkanContext::CleanUp()
@@ -57,6 +58,23 @@ namespace Snowflax
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
 		SFLX_ASSERT(result == VK_SUCCESS, "Failed to create vulkan instance!");
+	}
+
+	void VulkanContext::PickPhysicalDevice()
+	{
+		auto devices = GetPhysicalDevices();
+
+		std::multimap<int, VkPhysicalDevice> candidates;
+
+		for(auto device : devices)
+		{
+			candidates.insert(
+				std::make_pair(RatePhysicalDeviceSuitability(device), device));
+		}
+
+		SFLX_ASSERT(candidates.rbegin()->first > 0, "Failed to find suitable GPU!");
+
+		if(candidates.rbegin()->first > 0) m_PhysicalDevice = candidates.rbegin()->second;
 	}
 
 	std::vector<VkExtensionProperties> VulkanContext::GetSupportedExtensions()
@@ -133,6 +151,50 @@ namespace Snowflax
 #endif
 
 		return layers;
+	}
+
+	std::vector<VkPhysicalDevice> VulkanContext::GetPhysicalDevices() const
+	{
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
+		SFLX_ASSERT(deviceCount, "Failed to find GPUs with vulkan support!");
+
+		std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
+		vkEnumeratePhysicalDevices(m_Instance, &deviceCount, physicalDevices.data());
+
+		return physicalDevices;
+	}
+
+	VkPhysicalDeviceProperties VulkanContext::GetPhysicalDeviceProperties(VkPhysicalDevice& _device)
+	{
+		VkPhysicalDeviceProperties properties;
+		vkGetPhysicalDeviceProperties(_device, &properties);
+
+		return properties;
+	}
+
+	VkPhysicalDeviceFeatures VulkanContext::GetPhysicalDeviceFeatures(VkPhysicalDevice& _device)
+	{
+		VkPhysicalDeviceFeatures features;
+		vkGetPhysicalDeviceFeatures(_device, &features);
+
+		return features;
+	}
+
+	bool VulkanContext::CheckPhysicalDeviceFeatures(VkPhysicalDevice& _device)
+	{
+		return true;
+	}
+
+	bool VulkanContext::CheckPhysicalDeviceLimits(VkPhysicalDevice& _device)
+	{
+		return true;
+	}
+
+	int VulkanContext::RatePhysicalDeviceSuitability(VkPhysicalDevice& _device)
+	{
+		if(!CheckPhysicalDeviceFeatures(_device) || !CheckPhysicalDeviceLimits(_device)) return 0;
+		return 1;
 	}
 
 #ifdef SFLX_VULKAN_ENABLE_DEBUG_MESSENGER

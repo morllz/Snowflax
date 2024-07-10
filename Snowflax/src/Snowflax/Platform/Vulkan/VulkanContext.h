@@ -20,6 +20,7 @@ namespace Snowflax
 	private:
 
 		void CreateInstance();
+		void PickPhysicalDevice();
 
 		static std::vector<VkExtensionProperties> GetSupportedExtensions();
 		static std::vector<VkLayerProperties> GetSupportedLayers();
@@ -27,6 +28,13 @@ namespace Snowflax
 		static bool CheckLayerSupport(const char* _layerName);
 		static std::vector<const char*> GetRequiredExtensions();
 		static std::vector<const char*> GetRequiredLayers();
+
+		std::vector<VkPhysicalDevice> GetPhysicalDevices() const;
+		static VkPhysicalDeviceProperties GetPhysicalDeviceProperties(VkPhysicalDevice& _device);
+		static VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice& _device);
+		static bool CheckPhysicalDeviceFeatures(VkPhysicalDevice& _device);
+		static bool CheckPhysicalDeviceLimits(VkPhysicalDevice& _device);
+		static int RatePhysicalDeviceSuitability(VkPhysicalDevice& _device);
 
 #ifdef SFLX_VULKAN_ENABLE_DEBUG_MESSENGER
 		void SetupDebugMessenger();
@@ -50,9 +58,10 @@ namespace Snowflax
 			VkDebugUtilsMessengerEXT _debugMessenger, 
 			const VkAllocationCallbacks* _pAllocator);
 
-		VkDebugUtilsMessengerEXT m_DebugMessenger = nullptr;
+		VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
 #endif
 
-		VkInstance m_Instance = nullptr;
+		VkInstance m_Instance = VK_NULL_HANDLE;
+		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 	};
 }
