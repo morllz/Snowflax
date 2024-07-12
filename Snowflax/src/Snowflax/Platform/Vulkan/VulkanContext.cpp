@@ -181,9 +181,49 @@ namespace Snowflax
 		return features;
 	}
 
+	std::vector<VkQueueFamilyProperties> VulkanContext::GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device)
+	{
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(_device, &queueFamilyCount, nullptr);
+
+		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(_device, &queueFamilyCount, queueFamilies.data());
+
+		return queueFamilies;
+	}
+
+	VulkanContext::QueueFamilyIndices VulkanContext::FindPhysicalDeviceQueueFamilies(VkPhysicalDevice& _device)
+	{
+		QueueFamilyIndices familyIndices;
+
+		auto familyProperties = GetPhysicalDeviceQueueFamilyProperties(_device);
+
+		for(auto it = familyProperties.begin(); it != familyProperties.end(); ++it)
+		{
+			if(it->queueFlags & VK_QUEUE_GRAPHICS_BIT)
+				familyIndices.GraphicsFamily = static_cast<uint32_t>(it - familyProperties.begin());
+
+			if(familyIndices.IsComplete()) break;
+		}
+
+		return familyIndices;
+	}
+
+	bool VulkanContext::CheckPhysicalDeviceProperties(VkPhysicalDevice& _device)
+	{
+		auto properties = GetPhysicalDeviceProperties(_device);
+
+		return
+			properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ||
+			properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ||
+			properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU;
+	}
+
 	bool VulkanContext::CheckPhysicalDeviceFeatures(VkPhysicalDevice& _device)
 	{
-		return true;
+		auto features = GetPhysicalDeviceFeatures(_device);
+
+		return features.geometryShader;
 	}
 
 	bool VulkanContext::CheckPhysicalDeviceLimits(VkPhysicalDevice& _device)
@@ -191,9 +231,20 @@ namespace Snowflax
 		return true;
 	}
 
+	bool VulkanContext::CheckPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device)
+	{
+		auto queueIndices = FindPhysicalDeviceQueueFamilies(_device);
+
+		return queueIndices.IsComplete();
+	}
+
 	int VulkanContext::RatePhysicalDeviceSuitability(VkPhysicalDevice& _device)
 	{
-		if(!CheckPhysicalDeviceFeatures(_device) || !CheckPhysicalDeviceLimits(_device)) return 0;
+		if(!(CheckPhysicalDeviceProperties(_device) && 
+			CheckPhysicalDeviceFeatures(_device) && 
+			CheckPhysicalDeviceLimits(_device)) &&
+			CheckPhysicalDeviceQueueFamilyProperties(_device)
+			) return 0;
 		return 1;
 	}
 

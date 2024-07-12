@@ -29,11 +29,24 @@ namespace Snowflax
 		static std::vector<const char*> GetRequiredExtensions();
 		static std::vector<const char*> GetRequiredLayers();
 
+		struct QueueFamilyIndices
+		{
+		    std::optional<uint32_t> GraphicsFamily;
+		
+		    bool IsComplete() const {
+		        return GraphicsFamily.has_value();
+		    }
+		};
+
 		std::vector<VkPhysicalDevice> GetPhysicalDevices() const;
 		static VkPhysicalDeviceProperties GetPhysicalDeviceProperties(VkPhysicalDevice& _device);
 		static VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice& _device);
+		static std::vector<VkQueueFamilyProperties> GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device);
+		static QueueFamilyIndices FindPhysicalDeviceQueueFamilies(VkPhysicalDevice& _device);
+		static bool CheckPhysicalDeviceProperties(VkPhysicalDevice& _device);
 		static bool CheckPhysicalDeviceFeatures(VkPhysicalDevice& _device);
 		static bool CheckPhysicalDeviceLimits(VkPhysicalDevice& _device);
+		static bool CheckPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device);
 		static int RatePhysicalDeviceSuitability(VkPhysicalDevice& _device);
 
 #ifdef SFLX_VULKAN_ENABLE_DEBUG_MESSENGER
