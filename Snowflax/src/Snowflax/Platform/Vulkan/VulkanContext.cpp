@@ -19,6 +19,7 @@ namespace Snowflax
 
 	void VulkanContext::CleanUp()
 	{
+		vkDestroyDevice(m_LogicalDevice, nullptr);
 #ifdef SFLX_VULKAN_ENABLE_DEBUG_MESSENGER
 		DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 #endif
