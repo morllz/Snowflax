@@ -14,6 +14,7 @@ namespace Snowflax
 #endif
 
 		PickPhysicalDevice();
+		CreateLogicalDevice();
 	}
 
 	void VulkanContext::CleanUp()
@@ -48,11 +49,19 @@ namespace Snowflax
 		createInfo.pNext = &debugCreateInfo;
 #endif
 
-		auto extensions = GetRequiredExtensions();
+		auto extensions = GetRequiredInstanceExtensions();
+		for(auto extensionName : extensions)
+		{
+			SFLX_ASSERT(CheckInstanceExtensionSupport(extensionName), "Required vulkan instance extension not supported!");
+		}
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		createInfo.ppEnabledExtensionNames = extensions.data();
 
-		auto layers = GetRequiredLayers();
+		auto layers = GetRequiredInstanceLayers();
+		for(auto layerName : layers)
+		{
+			SFLX_ASSERT(CheckInstanceLayerSupport(layerName), "Required vulkan instance layer not supported!");
+		}
 		createInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
 		createInfo.ppEnabledLayerNames = layers.data();
 
@@ -77,7 +86,54 @@ namespace Snowflax
 		if(candidates.rbegin()->first > 0) m_PhysicalDevice = candidates.rbegin()->second;
 	}
 
-	std::vector<VkExtensionProperties> VulkanContext::GetSupportedExtensions()
+	void VulkanContext::CreateLogicalDevice()
+	{
+		auto[graphicsFamily] = FindPhysicalDeviceQueueFamilies(m_PhysicalDevice);
+
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+
+		if(graphicsFamily.has_value())
+		{
+			VkDeviceQueueCreateInfo graphicsQueueCreateInfo{};
+			graphicsQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			graphicsQueueCreateInfo.queueFamilyIndex = graphicsFamily.value();
+			graphicsQueueCreateInfo.queueCount = 1;
+			constexpr float graphicsQueuePriority = 1.0f;
+			graphicsQueueCreateInfo.pQueuePriorities = &graphicsQueuePriority;
+
+			queueCreateInfos.push_back(graphicsQueueCreateInfo);
+		}
+
+		VkPhysicalDeviceFeatures deviceFeatures{};
+
+		VkDeviceCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.pQueueCreateInfos = queueCreateInfos.data();
+		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+
+		createInfo.pEnabledFeatures = &deviceFeatures;
+
+		auto extensions = GetRequiredDeviceExtensions();
+		for(auto extensionName : extensions)
+		{
+			SFLX_ASSERT(CheckDeviceExtensionSupport(m_PhysicalDevice, extensionName), "Required vulkan device extension not supported by physical device!");
+		}
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+		createInfo.ppEnabledExtensionNames = extensions.data();
+
+		auto layers = GetRequiredDeviceLayers();
+		for(auto layerName : layers)
+		{
+			SFLX_ASSERT(CheckDeviceLayerSupport(m_PhysicalDevice, layerName), "Required vulkan device layer not supported by physical device!");
+		}
+		createInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
+		createInfo.ppEnabledLayerNames = layers.data();
+
+		auto result = vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_LogicalDevice);
+		SFLX_ASSERT(result == VK_SUCCESS, "Creation of logical device failed");
+	}
+
+	std::vector<VkExtensionProperties> VulkanContext::GetSupportedInstanceExtensions()
 	{
 		uint32_t extensionCount = 0;
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -88,7 +144,7 @@ namespace Snowflax
 		return  extensions;
 	}
 
-	std::vector<VkLayerProperties> VulkanContext::GetSupportedLayers()
+	std::vector<VkLayerProperties> VulkanContext::GetSupportedInstanceLayers()
 	{
 		uint32_t layerCount = 0;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -99,29 +155,29 @@ namespace Snowflax
 		return layers;
 	}
 
-	bool VulkanContext::CheckExtensionSupport(const char* _extensionName)
+	bool VulkanContext::CheckInstanceExtensionSupport(const char* _extensionName)
 	{
-		auto extensions = GetSupportedExtensions();
+		const auto extensions = GetSupportedInstanceExtensions();
 
-		for(auto&[extensionName, specVersion] : extensions)
+		for(const auto&[extensionName, specVersion] : extensions)
 		{
 			if(strcmp(extensionName, _extensionName) == 0) return true;
 		}
 		return false;
 	}
 
-	bool VulkanContext::CheckLayerSupport(const char* _layerName)
+	bool VulkanContext::CheckInstanceLayerSupport(const char* _layerName)
 	{
-		auto layers = GetSupportedLayers();
+		const auto layers = GetSupportedInstanceLayers();
 
-		for(auto&[layerName, specVersion, implementationVersion, description] : layers)
+		for(const auto&[layerName, specVersion, implementationVersion, description] : layers)
 		{
 			if(strcmp(layerName, _layerName) == 0) return true;
 		}
 		return false;
 	}
 
-	std::vector<const char*> VulkanContext::GetRequiredExtensions()
+	std::vector<const char*> VulkanContext::GetRequiredInstanceExtensions()
 	{
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -134,18 +190,16 @@ namespace Snowflax
 		return extensions;
 	}
 
-	std::vector<const char*> VulkanContext::GetRequiredLayers()
+	std::vector<const char*> VulkanContext::GetRequiredInstanceLayers()
 	{
 		std::vector<const char*> layers {};
 
 #ifdef SFLX_VULKAN_ENABLE_VALIDATION_LAYERS
-		const std::vector<const char*> validationLayers = {
-			"VK_LAYER_KHRONOS_validation"
-		};
+		const auto validationLayers = GetValidationLayers();
 
 		for(auto layerName : validationLayers)
 		{
-			SFLX_ASSERT(CheckLayerSupport(layerName), "Vulkan validation lay not supported!");
+			SFLX_ASSERT(CheckInstanceLayerSupport(layerName), "Vulkan validation layer not supported!");
 			layers.push_back(layerName);
 		}
 #endif
@@ -248,6 +302,81 @@ namespace Snowflax
 		return 1;
 	}
 
+	std::vector<VkExtensionProperties> VulkanContext::GetSupportedDeviceExtensions(VkPhysicalDevice& _device)
+	{
+		uint32_t extensionCount = 0;
+		vkEnumerateDeviceExtensionProperties(_device, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> extensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(_device, nullptr, &extensionCount, extensions.data());
+
+		return extensions;
+	}
+
+	std::vector<VkLayerProperties> VulkanContext::GetSupportedDeviceLayers(VkPhysicalDevice& _device)
+	{
+		uint32_t layerCount = 0;
+		vkEnumerateDeviceLayerProperties(_device, &layerCount, nullptr);
+
+		std::vector<VkLayerProperties> layers(layerCount);
+		vkEnumerateDeviceLayerProperties(_device, &layerCount, layers.data());
+
+		return layers;
+	}
+
+	bool VulkanContext::CheckDeviceExtensionSupport(VkPhysicalDevice& _device, const char* _extensionName)
+	{
+		const auto extensions = GetSupportedDeviceExtensions(_device);
+
+		for(const auto&[extensionName, specVersion] : extensions)
+		{
+			if(strcmp(extensionName, _extensionName) == 0) return true;
+		}
+		return false;
+	}
+
+	bool VulkanContext::CheckDeviceLayerSupport(VkPhysicalDevice& _device, const char* _layerName)
+	{
+		const auto layers = GetSupportedDeviceLayers(_device);
+
+		for(const auto&[layerName, specVersion, implementationVersion, description] : layers)
+		{
+			if(strcmp(layerName, _layerName) == 0) return true;
+		}
+		return false;
+	}
+
+	std::vector<const char*> VulkanContext::GetRequiredDeviceExtensions()
+	{
+		return {};
+	}
+
+	std::vector<const char*> VulkanContext::GetRequiredDeviceLayers()
+	{
+		std::vector<const char*> layers {};
+
+#ifdef SFLX_VULKAN_ENABLE_VALIDATION_LAYERS
+		const auto validationLayers = GetValidationLayers();
+
+		for(auto layerName : validationLayers)
+		{
+			SFLX_ASSERT(CheckInstanceLayerSupport(layerName), "Vulkan validation layer not supported!");
+			layers.push_back(layerName);
+		}
+#endif
+
+		return layers;
+	}
+
+#ifdef SFLX_VULKAN_ENABLE_VALIDATION_LAYERS
+	std::vector<const char*> VulkanContext::GetValidationLayers()
+	{
+		return {
+			"VK_LAYER_KHRONOS_validation"
+		};
+	}
+#endif
+
 #ifdef SFLX_VULKAN_ENABLE_DEBUG_MESSENGER
 	void VulkanContext::SetupDebugMessenger()
 	{
@@ -268,8 +397,8 @@ namespace Snowflax
 	}
 
 	VkBool32 VulkanContext::DebugMessengerCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT _messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT _messageType, 
+		const VkDebugUtilsMessageSeverityFlagBitsEXT _messageSeverity,
+		const VkDebugUtilsMessageTypeFlagsEXT _messageType, 
 		const VkDebugUtilsMessengerCallbackDataEXT* _pCallbackData,
 		void* _pUserData)
 	{
@@ -296,7 +425,7 @@ namespace Snowflax
 			break;
 		}
 
-		std::string message = std::format("Vulkan ({}): {}", type, _pCallbackData->pMessage);
+		const std::string message = std::format("Vulkan ({}): {}", type, _pCallbackData->pMessage);
 
 		if(_messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
 			SFLX_LOG_DEBUG(message);
