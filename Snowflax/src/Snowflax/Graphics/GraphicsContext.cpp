@@ -5,8 +5,8 @@
 
 namespace Snowflax
 {
-	Scope<GraphicsContext> GraphicsContext::Create() {
-		return MakeScope<VulkanContext>();
+	Scope<GraphicsContext> GraphicsContext::Create(Window* _window) {
+		return MakeScope<VulkanContext>(_window);
 	}
 
 }

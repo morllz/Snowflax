@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Snowflax/Core/Base.h"
+#include "Snowflax/Core/Window.h"
 
 
 namespace Snowflax
@@ -14,6 +15,6 @@ namespace Snowflax
 		virtual void Init() = 0;
 		virtual void CleanUp() = 0;
 
-		static Scope<GraphicsContext> Create();
+		static Scope<GraphicsContext> Create(Window* _window);
 	};
 }

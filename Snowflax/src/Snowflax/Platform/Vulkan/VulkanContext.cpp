@@ -5,6 +5,10 @@
 
 namespace Snowflax
 {
+	VulkanContext::VulkanContext(Window* _window) : m_Window(_window)
+	{
+	}
+
 	void VulkanContext::Init()
 	{
 		CreateInstance();
@@ -13,6 +17,7 @@ namespace Snowflax
 		SetupDebugMessenger();
 #endif
 
+		CreateSurface();
 		PickPhysicalDevice();
 		CreateLogicalDevice();
 	}
@@ -20,6 +25,7 @@ namespace Snowflax
 	void VulkanContext::CleanUp()
 	{
 		vkDestroyDevice(m_LogicalDevice, nullptr);
+		vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
 #ifdef SFLX_VULKAN_ENABLE_DEBUG_MESSENGER
 		DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 #endif
@@ -79,7 +85,7 @@ namespace Snowflax
 		for(auto device : devices)
 		{
 			candidates.insert(
-				std::make_pair(RatePhysicalDeviceSuitability(device), device));
+				std::make_pair(RatePhysicalDeviceSuitability(device, m_Surface), device));
 		}
 
 		SFLX_ASSERT(candidates.rbegin()->first > 0, "Failed to find suitable GPU!");
@@ -89,20 +95,26 @@ namespace Snowflax
 
 	void VulkanContext::CreateLogicalDevice()
 	{
-		auto[graphicsFamily] = FindPhysicalDeviceQueueFamilies(m_PhysicalDevice);
+		auto[graphicsFamily, presentationFamily] = FindPhysicalDeviceQueueFamilies(m_PhysicalDevice, m_Surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<uint32_t> uniqueQueueFamilies;
 
 		if(graphicsFamily.has_value())
-		{
-			VkDeviceQueueCreateInfo graphicsQueueCreateInfo{};
-			graphicsQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			graphicsQueueCreateInfo.queueFamilyIndex = graphicsFamily.value();
-			graphicsQueueCreateInfo.queueCount = 1;
-			constexpr float graphicsQueuePriority = 1.0f;
-			graphicsQueueCreateInfo.pQueuePriorities = &graphicsQueuePriority;
+			uniqueQueueFamilies.insert(graphicsFamily.value());
+		if(presentationFamily.has_value())
+			uniqueQueueFamilies.insert(presentationFamily.value());
 
-			queueCreateInfos.push_back(graphicsQueueCreateInfo);
+		for(auto queueFamilyIndex : uniqueQueueFamilies)
+		{
+			VkDeviceQueueCreateInfo queueCreateInfo{};
+			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+			queueCreateInfo.queueCount = 1;
+			constexpr float queuePriority = 1.0f;
+			queueCreateInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(queueCreateInfo);
 		}
 
 		VkPhysicalDeviceFeatures deviceFeatures{};
@@ -132,6 +144,13 @@ namespace Snowflax
 
 		auto result = vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_LogicalDevice);
 		SFLX_ASSERT(result == VK_SUCCESS, "Creation of logical device failed");
+
+		if(graphicsFamily.has_value())
+			vkGetDeviceQueue(m_LogicalDevice, graphicsFamily.value(), 0, &m_GraphicsQueue);
+		SFLX_ASSERT(graphicsFamily.has_value(), "Failed to get graphics queue as no graphics queue family is present!");
+		if(presentationFamily.has_value())
+			vkGetDeviceQueue(m_LogicalDevice, presentationFamily.value(), 0, &m_PresentationQueue);
+		SFLX_ASSERT(presentationFamily.has_value(), "Failed to get presentation queue as no presentation queue family is present!");
 	}
 
 	std::vector<VkExtensionProperties> VulkanContext::GetSupportedInstanceExtensions()
@@ -208,6 +227,13 @@ namespace Snowflax
 		return layers;
 	}
 
+	void VulkanContext::CreateSurface()
+	{
+		auto window = static_cast<GLFWwindow*>(m_Window->GetNativeWindow());
+		auto result = glfwCreateWindowSurface(m_Instance, window, nullptr, &m_Surface);
+		SFLX_ASSERT(result == VK_SUCCESS, "Failed to create vulkan surface!");
+	}
+
 	std::vector<VkPhysicalDevice> VulkanContext::GetPhysicalDevices() const
 	{
 		uint32_t deviceCount = 0;
@@ -247,7 +273,7 @@ namespace Snowflax
 		return queueFamilies;
 	}
 
-	VulkanContext::QueueFamilyIndices VulkanContext::FindPhysicalDeviceQueueFamilies(VkPhysicalDevice& _device)
+	VulkanContext::QueueFamilyIndices VulkanContext::FindPhysicalDeviceQueueFamilies(VkPhysicalDevice& _device, VkSurfaceKHR& _surface)
 	{
 		QueueFamilyIndices familyIndices;
 
@@ -255,8 +281,15 @@ namespace Snowflax
 
 		for(auto it = familyProperties.begin(); it != familyProperties.end(); ++it)
 		{
+			auto queueIndex = static_cast<uint32_t>(it - familyProperties.begin());
+
 			if(it->queueFlags & VK_QUEUE_GRAPHICS_BIT)
-				familyIndices.GraphicsFamily = static_cast<uint32_t>(it - familyProperties.begin());
+				familyIndices.GraphicsFamily = queueIndex;
+
+			VkBool32 presentationSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(_device, queueIndex, _surface, &presentationSupport);
+			if(presentationSupport)
+				familyIndices.PresentationFamily = queueIndex;
 
 			if(familyIndices.IsComplete()) break;
 		}
@@ -286,19 +319,19 @@ namespace Snowflax
 		return true;
 	}
 
-	bool VulkanContext::CheckPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device)
+	bool VulkanContext::CheckPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device, VkSurfaceKHR& _surface)
 	{
-		auto queueIndices = FindPhysicalDeviceQueueFamilies(_device);
+		auto queueIndices = FindPhysicalDeviceQueueFamilies(_device, _surface);
 
 		return queueIndices.IsComplete();
 	}
 
-	int VulkanContext::RatePhysicalDeviceSuitability(VkPhysicalDevice& _device)
+	int VulkanContext::RatePhysicalDeviceSuitability(VkPhysicalDevice& _device, VkSurfaceKHR& _surface)
 	{
 		if(!(CheckPhysicalDeviceProperties(_device) && 
 			CheckPhysicalDeviceFeatures(_device) && 
 			CheckPhysicalDeviceLimits(_device)) &&
-			CheckPhysicalDeviceQueueFamilyProperties(_device)
+			CheckPhysicalDeviceQueueFamilyProperties(_device, _surface)
 			) return 0;
 		return 1;
 	}

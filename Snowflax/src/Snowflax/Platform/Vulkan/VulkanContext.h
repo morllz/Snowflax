@@ -13,6 +13,7 @@ namespace Snowflax
 	class VulkanContext : public GraphicsContext
 	{
 	public:
+		VulkanContext(Window* _window);
 
 		virtual void Init() override;
 		virtual void CleanUp() override;
@@ -30,6 +31,10 @@ namespace Snowflax
 		static std::vector<const char*> GetRequiredInstanceExtensions();
 		static std::vector<const char*> GetRequiredInstanceLayers();
 
+		// Surface
+
+		void CreateSurface();
+
 		// Physical Device
 		void PickPhysicalDevice();
 
@@ -41,18 +46,19 @@ namespace Snowflax
 		struct QueueFamilyIndices
 		{
 		    std::optional<uint32_t> GraphicsFamily;
+			std::optional<uint32_t> PresentationFamily;
 		
 		    bool IsComplete() const {
-		        return GraphicsFamily.has_value();
+		        return GraphicsFamily.has_value() && PresentationFamily.has_value();
 		    }
 		};
 
-		static QueueFamilyIndices FindPhysicalDeviceQueueFamilies(VkPhysicalDevice& _device);
+		static QueueFamilyIndices FindPhysicalDeviceQueueFamilies(VkPhysicalDevice& _device, VkSurfaceKHR& _surface);
 		static bool CheckPhysicalDeviceProperties(VkPhysicalDevice& _device);
 		static bool CheckPhysicalDeviceFeatures(VkPhysicalDevice& _device);
 		static bool CheckPhysicalDeviceLimits(VkPhysicalDevice& _device);
-		static bool CheckPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device);
-		static int RatePhysicalDeviceSuitability(VkPhysicalDevice& _device);
+		static bool CheckPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice& _device, VkSurfaceKHR& _surface);
+		static int RatePhysicalDeviceSuitability(VkPhysicalDevice& _device, VkSurfaceKHR& _surface);
 
 		// Logical Device
 		void CreateLogicalDevice();
@@ -63,6 +69,7 @@ namespace Snowflax
 		static bool CheckDeviceLayerSupport(VkPhysicalDevice& _device, const char* _layerName);
 		static std::vector<const char*> GetRequiredDeviceExtensions();
 		static std::vector<const char*> GetRequiredDeviceLayers();
+
 		// Validation layer
 
 #ifdef SFLX_VULKAN_ENABLE_VALIDATION_LAYERS
@@ -95,8 +102,15 @@ namespace Snowflax
 		VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
 #endif
 
+
+		Window* m_Window;
+
 		VkInstance m_Instance = VK_NULL_HANDLE;
+		VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_LogicalDevice = VK_NULL_HANDLE;
+
+		VkQueue m_GraphicsQueue = VK_NULL_HANDLE;
+		VkQueue m_PresentationQueue = VK_NULL_HANDLE;
 	};
 }

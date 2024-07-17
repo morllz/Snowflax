@@ -26,8 +26,11 @@ namespace Snowflax
 			SFLX_LOG_ERROR("GLFW error {0} occured! {1}", _errorCode, _description);
 		});
 
+
 		if(GLFWWindowCount == 0)
 			SFLX_ASSERT(glfwInit());
+
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 		m_Window = glfwCreateWindow(
 			static_cast<int>(_windowSpecs.Width), 
@@ -41,7 +44,7 @@ namespace Snowflax
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 
-		m_GraphicsContext = GraphicsContext::Create();
+		m_GraphicsContext = GraphicsContext::Create(this);
 		m_GraphicsContext->Init();
 
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* _window)
@@ -157,7 +160,7 @@ namespace Snowflax
 
 	void WindowsWindow::Update()
 	{
-		glfwSwapBuffers(m_Window);
+		//glfwSwapBuffers(m_Window);
 		glfwPollEvents();
 	}
 
